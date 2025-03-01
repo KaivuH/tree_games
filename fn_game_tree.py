@@ -98,6 +98,10 @@ class Move(BaseModel):
 class MoveChoices(BaseModel):
     choices: List[Move]
 
+class BranchResult(BaseModel):
+    root_move: Move  # The anchored candidate move from the starting state.
+    evaluation: Move  # The evaluated outcome for that branch (with description, and optionally a score).
+
 
 class Game:
     def __init__(self, env, model, action_signature: Dict[str, Any]):
@@ -114,7 +118,8 @@ class Game:
             # Set compute budget (could be adapted per player)
             current_budget = comp_budget if current_player == "black" else 0
             # Use the new recursive parallel search method
-            decision = await self.play_with_state(self.env.copy(), [], current_budget)
+            decision = await self.play_with_state(self.env.copy(), [], current_budget, start=True)
+            print(decision)
             # Apply the final chosen move on the actual environment.
             action = decision.action
             if action:
@@ -129,16 +134,22 @@ class Game:
                 break
         return self.env.get_result()
 
-    async def play_with_state(self, state, history: List[dict], budget: int, root_move: Optional[Move] = None, start=False) -> Move:
+    async def play_with_state(
+        self, state, history: List[dict], budget: int, root_move: Optional[Move] = None, start: bool = False
+    ) -> Union[Move, List[BranchResult]]:
         """
-        Recursive, parallel tree search from a given state with the remaining compute budget.
-        Anchors each branch to the candidate move taken at the starting state.
-        
-        Returns a Move (with 'action' and 'desc') that is the recommendation at the root.
+        Recursive tree search that, when not at the root, returns a list of BranchResult objects.
+        At the root (start=True), the method synthesizes the aggregated branch evaluations into one final move.
         """
-        # Base case: if no compute budget left, evaluate the current state.
+        # Base case: if no compute budget left, do a terminal evaluation.
         if budget <= 0:
-            return await self.evaluate_state(state, history, root_move)
+            eval_move = await self.evaluate_state(state, history, root_move)
+            # Return a list with one BranchResult. If no root_move was set, anchor on the evaluated move.
+            anchored = root_move if root_move is not None else eval_move
+            if start:
+                return eval_move
+            else:
+                return [BranchResult(root_move=anchored, evaluation=eval_move)]
     
         # Request candidate moves from the model.
         messages = [{
@@ -146,7 +157,7 @@ class Game:
             "content": (
                 f"History: {history}\n"
                 f"Board state:\n{str(state)}\n"
-                "Given the objective (win the game), list up to 3 candidate moves in UCI format with descriptions. "
+                "Given the objective (win the game), list up to 2 candidate moves in UCI format with descriptions. "
                 "UCI is for example 'f3e5a'. No Nb stuff."
             )
         }]
@@ -155,53 +166,55 @@ class Game:
             system_prompt=f"You are a chess AI providing candidate moves that will help you win. You are {state.get_turn()}",
             output_type=MoveChoices
         )).choices
-        print(options)
+        print("Candidate options:", options)
     
         if not options:
             # Fallback: if no options, evaluate the state.
-            return await self.evaluate_state(state, history, root_move)
+            eval_move = await self.evaluate_state(state, history, root_move)
+            anchored = root_move if root_move is not None else eval_move
+            return [BranchResult(root_move=anchored, evaluation=eval_move)]
     
-        async def simulate_option(option: Move) -> Tuple[Move, Move]:
-            # If no root_move is set for this branch, anchor it to the current candidate.
+        async def simulate_option(option: Move) -> List[BranchResult]:
+            # Anchor the branch on the candidate move if not already set.
             branch_root = root_move if root_move is not None else option
-            sim_state = state.copy()  # Assumes a proper copy method.
+            sim_state = state.copy()  # Assumes a proper deep copy.
             if not sim_state.take_action(option.action):
-                # If the move is invalid, return an anchored evaluation.
-                return branch_root, Move(action=option.action, desc="Invalid move")
+                # If the move is invalid, return an immediate branch result.
+                return [BranchResult(root_move=branch_root, evaluation=Move(action=option.action, desc="Invalid move"))]
             new_history = history + [option.dict()]
-            # Recurse with a reduced budget, while propagating the anchored (root) move.
-            subtree_decision = await self.play_with_state(sim_state, new_history, budget - 1, root_move=branch_root)
-            return branch_root, subtree_decision
+            # Recurse with a reduced budget.
+            return await self.play_with_state(sim_state, new_history, budget - 1, root_move=branch_root)
     
         # Launch simulations in parallel for each candidate option.
         tasks = [simulate_option(option) for option in options]
-        simulated_results = await asyncio.gather(*tasks)
-        simulated_results = [x for x in simulated_results if x[0].desc != "Invalid move"]
+        branches_results_lists = await asyncio.gather(*tasks)
+        # Flatten the list of lists into a single list of BranchResult objects.
+        all_branch_results = [br for sublist in branches_results_lists for br in sublist]
     
-        # Synthesize evaluations: force the synthesis to pick among the anchored moves.
-        synthesis_input = "Based on the following simulated branches from the original board state, decide which candidate move is best. " \
-                          "ONLY consider the moves proposed at the starting state (the anchored moves) and provide a brief justification.\n"
-        for branch_root, sim_eval in simulated_results:
+        # At a non-root level, simply return the aggregated branch results.
+        if not start:
+            return all_branch_results
+    
+        # At the root, synthesize a final decision from all branch results.
+        synthesis_input = "Based on the following branch evaluations from the original board state, " \
+                          "choose the best candidate move (from the starting state) and justify your choice briefly.\n"
+        for branch in all_branch_results:
             synthesis_input += (
-                f"Candidate move: {branch_root.action}, initial description: {branch_root.desc}; "
-                f"Simulation evaluation: {sim_eval.desc}\n"
+                f"Candidate move: {branch.root_move.action}, initial description: {branch.root_move.desc}, "
+                f"Simulation evaluation: {branch.evaluation.desc}\n"
             )
         synthesis_input += f"Board state was:\n{str(state)}\nHistory: {history}\n"
     
-        messages = [{
-            "role": "user",
-            "content": synthesis_input
-        }]
+        messages = [{"role": "user", "content": synthesis_input}]
         final_decision = await self.model.call(
             messages,
-            system_prompt=f"Synthesize branch results into one move decision in the chess game in UCI format. " \
+            system_prompt=f"Synthesize branch evaluations into one final move decision in UCI format. " \
                           f"Only consider the anchored candidate moves from the starting state. You are {self.env.get_turn()}",
             output_type=Move
         )
-        print(final_decision)
+        print("Final decision:", final_decision)
         return final_decision
-    
-    
+
     async def evaluate_state(self, state, history: List[dict], root_move: Optional[Move]) -> Move:
         """
         Terminal evaluation when no compute budget is left.
@@ -213,7 +226,7 @@ class Game:
                 f"Final board state:\n{str(state)}\n"
                 f"History: {history}\n"
                 "Provide a terminal evaluation and recommend a final move (in UCI format, e.g., f3e5) with a brief explanation. "
-                "ONLY consider the move proposed at the starting state of this branch. No Nb stuff."
+                "ONLY consider the move proposed at the starting state of this branch. No Nb stuff. "
                 f"You are {state.get_turn()}"
             )
         }]
@@ -222,13 +235,11 @@ class Game:
             system_prompt="Terminal state evaluation.",
             output_type=Move
         )
-        # Anchor the evaluation to the root move if one exists.
+        # If a branch anchor exists, force the evaluation to refer to that move.
         if root_move is not None:
             evaluation.action = root_move.action
             evaluation.desc = f"Anchored evaluation: {evaluation.desc}"
         return evaluation
-
-
 
 # Example main game loop
 async def main():
