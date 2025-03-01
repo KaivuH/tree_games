@@ -17,7 +17,7 @@ class ModelInterface:
     """
 
     def __init__(
-        self, model_name: str, api_key: Optional[str] = None, max_tokens: int = 1024
+        self, model_name: str, api_key: Optional[str] = None, max_tokens: int = 16000
     ):
         """
         Initialize the OpenRouter interface.
@@ -83,7 +83,6 @@ class ModelInterface:
                         max_completion_tokens=self.max_tokens,
                         tools=tools
                     )
-                    print(response)
                     if tools:
                         result = response.choices[0].message
                     else:
@@ -123,7 +122,14 @@ class ModelInterface:
 GAME_PROMPT = """
 You are a chess AI. You are in a chess environment and you are given affordances to plan before you take your move.
 
-Please use them to explore the space and play against yourself in the simulation before you play against your real opponent. Use them when you need to think Use them when you need to think about the env.
+Please use them to explore the space and play against yourself in the simulation before you play against your real opponent. Use them when you need to think about the env.
+Only communicate via tool calls. ALSO simulate and use the simulation tools before you do take_action. This is a way for you to acquire info.
+
+This is how you should approach the problem. 
+Take steps and learn the situation of the game/explore outcomes using take_simulated action and only after you have gained enough info go back and take_action. Explore several different moves before you finish.
+Remember you can backtrack if you don't like a current state. before you run out you need to call take_action, maybe in the last budget.
+
+Simulate the environment using the functions BEFORE you overthink. it's fine to simulate before you overthink.
 """
 
 class Game:
@@ -173,7 +179,12 @@ class Game:
                 "description": "Go back to the previous state in the environment",
                 "parameters": {
                     "type": "object",
-                    "properties": {}
+                    "properties": {
+                        "n_moves": {
+                            "type": "integer",
+                            "description": "How many moves you want to backtrack."
+                        }
+                    }
                 },
             }
         },
@@ -192,6 +203,26 @@ class Game:
 
         self.added_functions = {}
 
+    async def play_full_game(self, comp_budget: int):
+        """Play a full game with one player using comp_budget=1 and the other using the specified comp_budget."""
+        while not self.env.is_game_over():
+            # Get current player
+            current_player = self.env.get_turn()
+
+            print("turn", current_player)
+            
+            # Set compute budget based on player
+            if current_player == "white":
+                current_budget = comp_budget
+            else:
+                current_budget = 2
+                
+            # Make move for current player
+            await self.play(current_budget)
+            
+        # Return game result
+        return self.env.get_result()
+
 
     async def play(self, comp_budget: int):
         # todo: for now, naive understanding of compute
@@ -200,15 +231,13 @@ class Game:
         c_state = type(self.env)()  # Create new instance of same class
         c_state.__dict__.update(self.env.__dict__.copy())  # Copy all attributes
         messages = [{
-            "role": "user",
-            "content": f"You are playing a game. Current environment state:\n{str(c_state)}"
+            "role": "user", 
+            "content": f"You are playing a game of chess as {c_state.get_turn()}. Current board state:\n{str(c_state)}\n\nAs {c_state.get_turn()}, you need to analyze the position by making some exploratory moves using take_simulate_action and back_track before committing to your final move. You have {comp_budget} compute budget to explore variations. Use the provided functions to analyze and find the best move."
         }]
 
         for i in range(self.comp_budget):
 
-            print(messages)
             response = await self.model.call(messages, GAME_PROMPT, tools=self.tools)
-            print(response, i)
 
             if response.tool_calls:
                 tool_call = response.tool_calls[0]
@@ -249,23 +278,25 @@ class Game:
                     })
                 
                 elif tool_call.function.name == "take_simulated_action":
+                    print(arguments['action'])
                     c_state.take_action(arguments["action"])
                     messages.append({
                         "role": "user",
-                        "content": f"Took action {arguments} on game state. New env:\n{str(c_state)}."
+                        "content": f"Took action {arguments} on game state. New env:\n{str(c_state)}. You are now playing as {c_state.get_turn()}"
                     })
 
                     #result = self.play_from_state(, new_messages)
                 elif tool_call.function.name == "backtrack":
                     # Backtrack to previous state
-                    c_state.backtrack()
+                    c_state.backtrack(arguments["n_moves"])
                     messages = messages + [{
                         "role": "user", 
                         "content": f"Backtracked to previous state. Current env:\n{str(c_state)}."
                     }]
                 
                 elif tool_call.function.name == "take_action":
-                    self.env.take_action(arguments["action"])
+                    print("Final action", arguments["action"])
+                    print(self.env.take_action(arguments["action"]))
                     return arguments
             else:
                 raise "Did not use tools"
@@ -274,10 +305,20 @@ class Game:
                 "role": "user",
                 "content": f"You have {self.comp_budget - i} actions left."
             })
+            if i == self.comp_budget - 2:
+                print("ad")
+                messages.append({
+                    "role": "user",
+                    "content": f"Now call take_action with the final action based on what you've learned. Take this action on the original board state: {str(self.env)}. Remember that this is not the last state of the simulated game that was to learn. now take an action on the original starting game just given. You are {c_state.get_turn()}"
+                })
+
+    
 
 async def main():
     from chess_engine import core
+    import chess
     board = core.ChessEngine()
+    #board.board = chess.Board("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4")
     model_interface = ModelInterface(model_name="o3-mini")
     action_sig = {
         "action": {
@@ -286,7 +327,12 @@ async def main():
         }
     }
     game = Game(board, model_interface, action_sig)
-    await game.play(1)
+
+    #await game.play(20)
+    await game.play_full_game(10)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+# f7e8
+# 4o f3d5

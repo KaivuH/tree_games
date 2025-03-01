@@ -2,7 +2,7 @@ import chess
 import chess.svg
 
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
-import analysis
+from . import analysis
 
 class ChessEngine:
     def __init__(self):
@@ -48,13 +48,12 @@ class ChessEngine:
             return True
         return False
     
-    def backtrack(self) -> bool:
+    def backtrack(self, n_moves=1) -> bool:
         """Undo the last move if possible."""
-        if self.move_history:
-            self.board.pop()
-            self.move_history.pop()
-            return True
-        return False
+        for _ in range(n_moves):
+            if self.move_history:
+                self.board.pop()
+                self.move_history.pop()
     
     def get_move_history(self) -> List[chess.Move]:
         """Get the history of moves played."""
