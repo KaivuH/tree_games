@@ -3,63 +3,40 @@ import chess.svg
 import re
 import random
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
-from . import analysis
+import analysis
 
-def load_puzzles(puzzle_text):
-    """Extract puzzles from PGN text and return as a list of (fen, moves) tuples."""
+def load_puzzles_from_pgn(filename):
     puzzles = []
+    with open(filename, "r", encoding="utf-8") as pgn:
+        while True:
+            game = chess.pgn.read_game(pgn)
+            if game is None:
+                break
+            
+            # If it's a puzzle, it should have a SetUp and FEN header
+            if game.headers.get("SetUp") == "1" and "FEN" in game.headers:
+                fen = game.headers["FEN"]
+                # This sets up a board from the puzzle's FEN
+                board = chess.Board(fen=fen)
+                
+                # mainline_moves() yields the principal move sequence
+                # for that puzzle. We can store them in SAN or convert them to UCI.
+                move_sequence = list(game.mainline_moves())
+                
+                # If you want them in algebraic SAN:
+                san_moves = []
+                temp_board = board.copy()
+                for mv in move_sequence:
+                    san_moves.append(temp_board.san(mv))
+                    temp_board.push(mv)
+                
+                # Or in UCI:
+                uci_moves = [mv.uci() for mv in move_sequence]
+                
+                puzzles.append((fen, san_moves, uci_moves))
     
-    print(f"First 100 characters of file: {puzzle_text[:100]}")
-    
-    # Let's try a simple string-based split approach
-    # PGN files typically have [Event "..."] as a separator between games
-    blocks = puzzle_text.split('[Event ')
-    
-    # Skip the first empty block if it exists
-    if blocks and not blocks[0].strip():
-        blocks = blocks[1:]
-    else:
-        blocks = ['Event ' + block for block in blocks]
-    
-    print(f"Found {len(blocks)} blocks using string split")
-    
-    for i, block in enumerate(blocks):
-        block = '[Event ' + block  # Restore the [Event prefix
-        
-        # Extract FEN
-        fen_match = re.search(r'\[FEN\s*"([^"]+)"\]', block)
-        if not fen_match:
-            print(f"No FEN found in block {i}")
-            continue
-        
-        fen = fen_match.group(1)
-        print(f"Block {i}: Found FEN: {fen}")
-        
-        # Look for the moves section after the FEN tag
-        # In PGN format, moves typically come after all the header tags
-        post_fen = block[block.find(fen) + len(fen):]
-        
-        # Find the first line that has a move notation (1. or 1...)
-        move_line_match = re.search(r'\n\s*(\d+\..*?)\s*\*', post_fen, re.DOTALL)
-        if not move_line_match:
-            print(f"No moves found in block {i}")
-            continue
-        
-        move_text = move_line_match.group(1).strip()
-        print(f"Block {i}: Found moves: {move_text}")
-        
-        # Now parse the moves, splitting by spaces and filtering out move numbers
-        move_tokens = move_text.split()
-        # Keep only the actual moves, not the move numbers like "1." "2."
-        moves = [m for m in move_tokens if not re.match(r'^\d+\.\.?\.?$', m)]
-        
-        print(f"Block {i}: Parsed moves: {moves}")
-        
-        if moves:  # Only add if we found valid moves
-            puzzles.append((fen, moves))
-    
-    print(f"Successfully loaded {len(puzzles)} puzzles")
     return puzzles
+
 
 def load_random_puzzle(engine, puzzle_text):
     """Load a random puzzle into the chess engine."""
@@ -249,14 +226,13 @@ class ChessEngine:
 #         print("Failed to load puzzle!")
 
 if __name__ == "__main__":
-    puzzle_text = open("puzzle_mini.pgn", "r").read()
-    puzzles = load_puzzles(puzzle_text)
-    
-    engine = ChessEngine()
-    puzzle = load_random_puzzle(engine, puzzle_text)
-    if puzzle:
-        engine.board = engine.create_board_from_fen(puzzle['fen'])
-        print(engine.board)
-    else:
-        print("Failed to load puzzle!")
-
+    puzzles = load_puzzles_from_pgn("puzzle_mini.pgn")
+    print(puzzles)
+    for i, (fen, san_moves, uci_moves) in enumerate(puzzles):
+        print(f"Puzzle #{i+1}")
+        print("FEN:", fen)
+        print("SAN moves:", san_moves)
+        print("UCI moves:", uci_moves)
+        print("="*40)
+        if i > 5:
+            break
