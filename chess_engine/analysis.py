@@ -1,5 +1,6 @@
 import chess
-from typing import Dict, List, Any, Tuple, Set
+import chess.pgn
+from typing import Dict, List, Any, Tuple, Set, Optional
 
 def material_count(board: chess.Board, color: str) -> int:
     """
@@ -41,69 +42,6 @@ def material_balance(board: chess.Board) -> int:
     black_material = material_count(board, 'black')
     return white_material - black_material
 
-def center_control(board: chess.Board, color: str) -> int:
-    """
-    Calculate how many central squares (d4, e4, d5, e5) are controlled by the given color
-    
-    Args:
-        board: Chess board
-        color: 'white' or 'black'
-        
-    Returns:
-        Number of central squares controlled (0-4)
-    """
-    center_squares = [chess.E4, chess.D4, chess.E5, chess.D5]
-    color_bool = color == 'white'
-    
-    control_count = 0
-    for square in center_squares:
-        if board.is_attacked_by(color_bool, square):
-            control_count += 1
-    return control_count
-
-def development_score(board: chess.Board, color: str) -> float:
-    """
-    Calculate the development score for the given color
-    
-    Args:
-        board: Chess board
-        color: 'white' or 'black'
-        
-    Returns:
-        Development score between 0.0 and 1.0
-    """
-    # Count developed minor pieces and castling
-    color_bool = color == 'white'
-    
-    # Starting squares for knights and bishops
-    knight_start = [chess.B1, chess.G1] if color_bool else [chess.B8, chess.G8]
-    bishop_start = [chess.C1, chess.F1] if color_bool else [chess.C8, chess.F8]
-    
-    # Count developed pieces
-    pieces = board.piece_map()
-    developed = 0
-    total = 4  # 2 knights + 2 bishops
-    
-    # Check knights
-    for square in knight_start:
-        piece = pieces.get(square)
-        if piece is None or piece.piece_type != chess.KNIGHT:
-            developed += 1
-    
-    # Check bishops
-    for square in bishop_start:
-        piece = pieces.get(square)
-        if piece is None or piece.piece_type != chess.BISHOP:
-            developed += 1
-    
-    # Check if castled
-    king_square = chess.E1 if color_bool else chess.E8
-    king_piece = pieces.get(king_square)
-    if king_piece is None or king_piece.piece_type != chess.KING:
-        developed += 1  # King has moved, may have castled
-        total += 1
-        
-    return developed / total if total > 0 else 0.0
 
 def king_safety(board: chess.Board, color: str) -> float:
     """
@@ -148,79 +86,6 @@ def king_safety(board: chess.Board, color: str) -> float:
     
     return max(0.0, min(1.0, safety_score))
 
-def evaluate_position(board: chess.Board) -> Dict[str, Any]:
-    """
-    Comprehensive position evaluation including material, development, king safety, etc.
-    
-    Args:
-        board: Chess board
-        
-    Returns:
-        Dictionary with evaluation metrics
-    """
-    # Calculate various evaluation metrics
-    white_material = material_count(board, 'white')
-    black_material = material_count(board, 'black')
-    material_diff = white_material - black_material
-    
-    white_center = center_control(board, 'white')
-    black_center = center_control(board, 'black')
-    center_diff = white_center - black_center
-    
-    white_development = development_score(board, 'white')
-    black_development = development_score(board, 'black')
-    development_diff = white_development - black_development
-    
-    white_king_safety = king_safety(board, 'white')
-    black_king_safety = king_safety(board, 'black')
-    king_safety_diff = white_king_safety - black_king_safety
-    
-    # Normalize to a single score between -1.0 and 1.0
-    # Weights for different components can be tuned
-    material_weight = 0.5
-    center_weight = 0.15
-    development_weight = 0.2
-    king_safety_weight = 0.15
-    
-    # Normalize material (assuming max diff could be 3900 centipawns - roughly a queen + rook)
-    norm_material = material_diff / 3900.0
-    
-    # Calculate total score from weighted components
-    position_score = (
-        material_weight * norm_material + 
-        center_weight * (center_diff / 4.0) + 
-        development_weight * development_diff + 
-        king_safety_weight * king_safety_diff
-    )
-    
-    # Clamp to reasonable range
-    position_score = max(-1.0, min(1.0, position_score))
-    
-    # Create evaluation dictionary
-    evaluation = {
-        "position_score": position_score,  # -1.0 to 1.0, positive favors White
-        "material_balance": material_diff / 100.0,  # In pawns
-        "center_control": {
-            "white": white_center,
-            "black": black_center
-        },
-        "development": {
-            "white": white_development,
-            "black": black_development
-        },
-        "king_safety": {
-            "white": white_king_safety,
-            "black": black_king_safety
-        },
-        "is_check": board.is_check(),
-        "is_checkmate": board.is_checkmate(),
-        "is_stalemate": board.is_stalemate(),
-        "is_insufficient_material": board.is_insufficient_material(),
-        "halfmove_clock": board.halfmove_clock,
-        "fullmove_number": board.fullmove_number,
-    }
-    
-    return evaluation
 
 def is_piece_hanging(board: chess.Board, square: chess.Square) -> bool:
     """
@@ -248,7 +113,7 @@ def is_piece_hanging(board: chess.Board, square: chess.Square) -> bool:
         chess.KING: 99  # effectively infinite
     }[piece.piece_type]
     
-    # Find attackers and defenders
+    # Find attackers and defenders using built-in methods
     attackers = board.attackers(not piece_color, square)
     defenders = board.attackers(piece_color, square)
     
@@ -290,9 +155,9 @@ def get_hanging_pieces(
     """
     hanging = {'white': [], 'black': []}
     
-    for square in chess.SQUARES:
-        piece = board.piece_at(square)
-        if piece and is_piece_hanging(board, square):
+    # Efficiently iterate through all pieces on the board
+    for square, piece in board.piece_map().items():
+        if is_piece_hanging(board, square):
             color_key = 'white' if piece.color == chess.WHITE else 'black'
             hanging[color_key].append((square, piece))
     
@@ -313,28 +178,47 @@ def get_fork_candidates(board: chess.Board) -> List[Tuple[chess.Square, Set[ches
     fork_candidates = []
     
     # Check knight forks first (most common)
-    for square in chess.SQUARES:
-        knight = board.piece_at(square)
-        if knight and knight.piece_type == chess.KNIGHT:
-            targets = set()
-            knight_color = knight.color
+    knights = board.pieces(chess.KNIGHT, board.turn)
+    for square in knights:
+        knight_color = board.piece_at(square).color
+        targets = set()
+        
+        # Get all squares the knight attacks
+        attacks = board.attacks(square)
+        for target_square in attacks:
+            target_piece = board.piece_at(target_square)
             
-            # Get all squares the knight attacks
-            for move in [m for m in board.legal_moves if m.from_square == square]:
-                target_square = move.to_square
+            # If target is valuable and of opposite color
+            if (target_piece and 
+                target_piece.piece_type in valuable_pieces and 
+                target_piece.color != knight_color):
+                targets.add(target_square)
+        
+        # If knight attacks multiple valuable pieces, it's a fork
+        if len(targets) >= 2:
+            fork_candidates.append((square, targets))
+    
+    # Check for other piece types that can fork (queens, rooks, bishops)
+    for piece_type in [chess.QUEEN, chess.ROOK, chess.BISHOP]:
+        pieces = board.pieces(piece_type, board.turn)
+        for square in pieces:
+            piece_color = board.piece_at(square).color
+            targets = set()
+            
+            # Get all squares this piece attacks
+            attacks = board.attacks(square)
+            for target_square in attacks:
                 target_piece = board.piece_at(target_square)
                 
                 # If target is valuable and of opposite color
                 if (target_piece and 
                     target_piece.piece_type in valuable_pieces and 
-                    target_piece.color != knight_color):
+                    target_piece.color != piece_color):
                     targets.add(target_square)
             
-            # If knight attacks multiple valuable pieces, it's a fork
+            # If piece attacks multiple valuable pieces, it's a fork
             if len(targets) >= 2:
                 fork_candidates.append((square, targets))
-    
-    # TODO: Add checks for other piece types that can fork
     
     return fork_candidates
 
@@ -352,57 +236,114 @@ def get_pins(
     """
     pins = []
     
-    # Check for pins by sliding pieces (queen, rook, bishop)
-    for square in chess.SQUARES:
-        piece = board.piece_at(square)
-        
-        # Skip if no piece or not a sliding piece
-        if not piece or piece.piece_type not in {chess.QUEEN, chess.ROOK, chess.BISHOP}:
+    # Look for pins against both kings
+    for king_color in [chess.WHITE, chess.BLACK]:
+        # Find the king
+        kings = board.pieces(chess.KING, king_color)
+        if not kings:
             continue
             
-        piece_color = piece.color
+        king_square = next(iter(kings))
         
-        # Determine attack directions based on piece type
-        directions = []
-        if piece.piece_type in {chess.QUEEN, chess.ROOK}:
-            # Rook-like moves (files and ranks)
-            directions.extend([(0, 1), (1, 0), (0, -1), (-1, 0)])
+        # Get all squares with enemy sliding pieces
+        enemy_color = not king_color
+        enemy_queens = board.pieces(chess.QUEEN, enemy_color)
+        enemy_rooks = board.pieces(chess.ROOK, enemy_color)
+        enemy_bishops = board.pieces(chess.BISHOP, enemy_color)
         
-        if piece.piece_type in {chess.QUEEN, chess.BISHOP}:
-            # Bishop-like moves (diagonals)
-            directions.extend([(1, 1), (1, -1), (-1, 1), (-1, -1)])
-        
-        # Check each direction for pins
-        for dx, dy in directions:
-            file, rank = chess.square_file(square), chess.square_rank(square)
-            potential_pinned = None
-            
-            # Look along the line
-            for i in range(1, 8):
-                new_file, new_rank = file + i*dx, rank + i*dy
+        # Check for pins by queens (both orthogonal and diagonal)
+        for queen_square in enemy_queens:
+            ray = chess.ray(queen_square, king_square)
+            if ray:  # If queen and king are aligned
+                pinned_piece_found = False
+                pinned_square = None
                 
-                # Check if we're still on the board
-                if not (0 <= new_file < 8 and 0 <= new_rank < 8):
-                    break
+                # Scan from queen to king
+                for sq in ray:
+                    if sq == queen_square:
+                        continue
+                    if sq == king_square:
+                        if pinned_piece_found:
+                            pins.append((queen_square, pinned_square, king_square))
+                        break
+                        
+                    # Check if there's a piece in between
+                    piece = board.piece_at(sq)
+                    if piece:
+                        if pinned_piece_found:
+                            # Second piece found, no pin
+                            break
+                        elif piece.color == king_color:
+                            # Potential pinned piece
+                            pinned_piece_found = True
+                            pinned_square = sq
+                        else:
+                            # Enemy piece, no pin
+                            break
+                            
+        # Check for pins by rooks (orthogonal)
+        for rook_square in enemy_rooks:
+            if chess.square_file(rook_square) == chess.square_file(king_square) or \
+               chess.square_rank(rook_square) == chess.square_rank(king_square):
+                ray = chess.ray(rook_square, king_square)
+                if ray:  # If rook and king are aligned
+                    pinned_piece_found = False
+                    pinned_square = None
                     
-                target_square = chess.square(new_file, new_rank)
-                target_piece = board.piece_at(target_square)
-                
-                if not target_piece:
-                    # Empty square, continue checking
-                    continue
-                elif target_piece.color == piece_color:
-                    # Same color piece, no pin possible in this direction
-                    break
-                elif potential_pinned is None:
-                    # First enemy piece found, possible pinned piece
-                    potential_pinned = target_square
-                else:
-                    # Second enemy piece found
-                    # If it's a king, we have a pin
-                    if target_piece.piece_type == chess.KING:
-                        pins.append((square, potential_pinned, target_square))
-                    break
+                    # Scan from rook to king
+                    for sq in ray:
+                        if sq == rook_square:
+                            continue
+                        if sq == king_square:
+                            if pinned_piece_found:
+                                pins.append((rook_square, pinned_square, king_square))
+                            break
+                            
+                        # Check if there's a piece in between
+                        piece = board.piece_at(sq)
+                        if piece:
+                            if pinned_piece_found:
+                                # Second piece found, no pin
+                                break
+                            elif piece.color == king_color:
+                                # Potential pinned piece
+                                pinned_piece_found = True
+                                pinned_square = sq
+                            else:
+                                # Enemy piece, no pin
+                                break
+        
+        # Check for pins by bishops (diagonal)
+        for bishop_square in enemy_bishops:
+            if abs(chess.square_file(bishop_square) - chess.square_file(king_square)) == \
+               abs(chess.square_rank(bishop_square) - chess.square_rank(king_square)):
+                ray = chess.ray(bishop_square, king_square)
+                if ray:  # If bishop and king are aligned
+                    pinned_piece_found = False
+                    pinned_square = None
+                    
+                    # Scan from bishop to king
+                    for sq in ray:
+                        if sq == bishop_square:
+                            continue
+                        if sq == king_square:
+                            if pinned_piece_found:
+                                pins.append((bishop_square, pinned_square, king_square))
+                            break
+                            
+                        # Check if there's a piece in between
+                        piece = board.piece_at(sq)
+                        if piece:
+                            if pinned_piece_found:
+                                # Second piece found, no pin
+                                break
+                            elif piece.color == king_color:
+                                # Potential pinned piece
+                                pinned_piece_found = True
+                                pinned_square = sq
+                            else:
+                                # Enemy piece, no pin
+                                break
     
     return pins
 
@@ -420,71 +361,30 @@ def check_discover_check_candidates(board: chess.Board) -> List[chess.Square]:
     
     # Get the current turn
     current_color = board.turn
+    enemy_color = not current_color
     
     # Find the opponent's king
-    king_square = None
-    for sq in chess.SQUARES:
-        piece = board.piece_at(sq)
-        if piece and piece.piece_type == chess.KING and piece.color != current_color:
-            king_square = sq
-            break
-    
-    if king_square is None:
+    enemy_kings = board.pieces(chess.KING, enemy_color)
+    if not enemy_kings:
         return []  # No king found (shouldn't happen in a valid position)
-    
-    # Check from the king outward for potential discovered checks
-    king_file = chess.square_file(king_square)
-    king_rank = chess.square_rank(king_square)
-    
-    # Define the 8 directions (horizontal, vertical, diagonal)
-    directions = [
-        (0, 1), (1, 1), (1, 0), (1, -1),
-        (0, -1), (-1, -1), (-1, 0), (-1, 1)
-    ]
-    
-    for dx, dy in directions:
-        blocker = None
-        attack_piece = None
         
-        # Look along the line from king outward
-        for i in range(1, 8):
-            new_file, new_rank = king_file + i*dx, king_rank + i*dy
+    king_square = next(iter(enemy_kings))
+    
+    # Use python-chess's built-in pin detection
+    # We're looking for pieces that could be moved to reveal a check
+    for blocker_square in chess.SQUARES:
+        blocker = board.piece_at(blocker_square)
+        if not blocker or blocker.color != current_color:
+            continue
             
-            # Check if we're still on the board
-            if not (0 <= new_file < 8 and 0 <= new_rank < 8):
-                break
-                
-            check_square = chess.square(new_file, new_rank)
-            check_piece = board.piece_at(check_square)
-            
-            if not check_piece:
-                # Empty square, continue
-                continue
-            elif check_piece.color != current_color:
-                # Enemy piece, no discovery possible
-                break
-            elif blocker is None:
-                # First friendly piece - potential blocker
-                blocker = check_square
-            else:
-                # Second friendly piece - potential attacker
-                piece_type = check_piece.piece_type
-                
-                # Check if this piece could actually attack along this line
-                if ((abs(dx) == 1 and abs(dy) == 0) or 
-                        (abs(dx) == 0 and abs(dy) == 1)):
-                    # Rook-like direction
-                    if piece_type in {chess.ROOK, chess.QUEEN}:
-                        attack_piece = check_square
-                        break
-                elif abs(dx) == 1 and abs(dy) == 1:
-                    # Bishop-like direction
-                    if piece_type in {chess.BISHOP, chess.QUEEN}:
-                        attack_piece = check_square
-                        break
-                
-        # If we found both a blocker and an attacker, the blocker is a candidate
-        if blocker is not None and attack_piece is not None:
-            candidates.append(blocker)
+        # Check if this piece blocks a check from our piece to enemy king
+        # We simulate removing it and see if that creates a check
+        board_copy = board.copy()
+        # Remove the piece (replace with empty square)
+        board_copy.remove_piece_at(blocker_square)
+        
+        # If removing this piece creates a check, it's a discovered check candidate
+        if board_copy.is_check():
+            candidates.append(blocker_square)
     
     return candidates

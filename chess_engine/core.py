@@ -1,8 +1,105 @@
 import chess
 import chess.svg
-
+import re
+import random
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
 from . import analysis
+
+def load_puzzles(puzzle_text):
+    """Extract puzzles from PGN text and return as a list of (fen, moves) tuples."""
+    puzzles = []
+    
+    print(f"First 100 characters of file: {puzzle_text[:100]}")
+    
+    # Let's try a simple string-based split approach
+    # PGN files typically have [Event "..."] as a separator between games
+    blocks = puzzle_text.split('[Event ')
+    
+    # Skip the first empty block if it exists
+    if blocks and not blocks[0].strip():
+        blocks = blocks[1:]
+    else:
+        blocks = ['Event ' + block for block in blocks]
+    
+    print(f"Found {len(blocks)} blocks using string split")
+    
+    for i, block in enumerate(blocks):
+        block = '[Event ' + block  # Restore the [Event prefix
+        
+        # Extract FEN
+        fen_match = re.search(r'\[FEN\s*"([^"]+)"\]', block)
+        if not fen_match:
+            print(f"No FEN found in block {i}")
+            continue
+        
+        fen = fen_match.group(1)
+        print(f"Block {i}: Found FEN: {fen}")
+        
+        # Look for the moves section after the FEN tag
+        # In PGN format, moves typically come after all the header tags
+        post_fen = block[block.find(fen) + len(fen):]
+        
+        # Find the first line that has a move notation (1. or 1...)
+        move_line_match = re.search(r'\n\s*(\d+\..*?)\s*\*', post_fen, re.DOTALL)
+        if not move_line_match:
+            print(f"No moves found in block {i}")
+            continue
+        
+        move_text = move_line_match.group(1).strip()
+        print(f"Block {i}: Found moves: {move_text}")
+        
+        # Now parse the moves, splitting by spaces and filtering out move numbers
+        move_tokens = move_text.split()
+        # Keep only the actual moves, not the move numbers like "1." "2."
+        moves = [m for m in move_tokens if not re.match(r'^\d+\.\.?\.?$', m)]
+        
+        print(f"Block {i}: Parsed moves: {moves}")
+        
+        if moves:  # Only add if we found valid moves
+            puzzles.append((fen, moves))
+    
+    print(f"Successfully loaded {len(puzzles)} puzzles")
+    return puzzles
+
+def load_random_puzzle(engine, puzzle_text):
+    """Load a random puzzle into the chess engine."""
+    
+    puzzles = load_puzzles(puzzle_text)
+    if not puzzles:
+        print("No puzzles loaded!")
+        return None
+    
+    print(f"Selecting from {len(puzzles)} puzzles")
+    fen, moves = random.choice(puzzles)
+    print(f"Selected puzzle with FEN: {fen}")
+    print(f"Moves: {moves}")
+    
+    # Set up the board with the puzzle position
+    engine.board = chess.Board(fen)
+    engine.move_history = []
+    
+    # Convert algebraic moves to UCI
+    uci_moves = []
+    temp_board = chess.Board(fen)
+    for move in moves:
+        # Clean up any annotations
+        clean_move = re.sub(r'[+#]', '', move)
+        try:
+            san_move = temp_board.parse_san(clean_move)
+            uci_moves.append(san_move.uci())
+            temp_board.push(san_move)
+        except ValueError as e:
+            print(f"Error parsing move '{move}': {e}")
+            continue
+    
+    print(f"UCI moves: {uci_moves}")
+    
+    return {
+        'fen': fen,
+        'moves': uci_moves,
+        'turn': 'white' if engine.board.turn == chess.WHITE else 'black'
+    }
+
 
 class ChessEngine:
     def __init__(self):
@@ -124,18 +221,42 @@ class ChessEngine:
         """Get the material balance in centipawns (+ve means white advantage)."""
         return analysis.material_balance(self.board)
     
-    # def load_board_from_pgn(self, pgn: str) -> chess.Board:
-    #     """Load a chess board from PGN format."""
-    #     game = chess.pgn.read_game(io.StringIO(pgn))
-    #     board = game.end().board()
-    #     self.board = board
-    #     self.move_history = list(game.mainline_moves())
-    #     return board
 
+# if __name__ == "__main__":
+#     # Check if a specific piece is hanging
+#     engine = ChessEngine()
+#     # Try both relative and absolute paths
+#     try:
+#         # First try current directory
+#         with open("puzzle_mini.pgn", "r") as file:
+#             puzzle_text = file.read()
+#         print(f"Successfully loaded from current directory, file size: {len(puzzle_text)} bytes")
+#     except FileNotFoundError:
+#         try:
+#             # Then try with the module path
+#             with open("chess_engine/puzzle_mini.pgn", "r") as file:
+#                 puzzle_text = file.read()
+#             print(f"Successfully loaded from chess_engine directory, file size: {len(puzzle_text)} bytes")
+#         except FileNotFoundError:
+#             print("Could not find puzzle_mini.pgn in either location!")
+#             exit(1)
     
+#     puzzle = load_random_puzzle(engine, puzzle_text)
+#     if puzzle:
+#         engine.board = engine.create_board_from_fen(puzzle['fen'])
+#         print(engine.board)
+#     else:
+#         print("Failed to load puzzle!")
 
 if __name__ == "__main__":
-    # Check if a specific piece is hanging
+    puzzle_text = open("puzzle_mini.pgn", "r").read()
+    puzzles = load_puzzles(puzzle_text)
+    
     engine = ChessEngine()
-    engine.board = chess.Board("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4")
-    print(engine.board)
+    puzzle = load_random_puzzle(engine, puzzle_text)
+    if puzzle:
+        engine.board = engine.create_board_from_fen(puzzle['fen'])
+        print(engine.board)
+    else:
+        print("Failed to load puzzle!")
+

@@ -8,3 +8,267 @@
 [FEN "2kr4/1p1r1p2/2p1p2p/8/P1P1Rp2/8/1P3PPP/R5K1 w KQkq - 0 1"]
 
 1.Rxf4 Rd1+ 2.Rxd1 Rxd1# *
+
+[Event "0728 03099"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "3r3k/6pp/3Q4/q7/8/4P2P/6P1/5RK1 b KQkq - 0 1"]
+
+1...Rxd6 2.Rf8# *
+
+[Event "0730 61716"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "2r3k1/2r2p2/p1R3pp/8/8/8/P4PPP/R5K1 w KQkq - 0 1"]
+
+1.Rxa6 Rc1+ *
+
+[Event "0733 53943"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "8/1r2bk2/p2R4/2p2p2/P1N3p1/1P4P1/2K2P2/8 b KQkq - 0 1"]
+
+1...Bxd6 2.Nxd6+ *
+
+[Event "0735 25632"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "8/8/8/6R1/P4p2/3K1k2/6r1/8 w KQkq - 0 1"]
+
+1.Rxg2 Kxg2 2.a5 f3 3.a6 f2 4.a7 f1=Q+ *
+
+[Event "0736 15988"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "1r4k1/5ppp/1R6/8/rp2PP2/8/4KNPP/3R4 b KQkq - 0 1"]
+
+1...Rxb6 2.Rd8# *
+
+[Event "0740 18830"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "8/8/r7/P4k2/3p1p2/3P4/5K2/7R b KQkq - 0 1"]
+
+1...Rxa5 2.Rh5+ *
+
+[Event "0744 37849"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "6k1/pp3ppp/2n5/4q1B1/3p4/P7/1PP2PPP/4QK2 b KQkq - 0 1"]
+
+1...Qxg5 2.Qe8# *
+
+[Event "0749 51610"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "4r1k1/5ppb/p7/1p1R4/8/1PP4P/P3NP2/6K1 b KQkq - 0 1"]
+
+1...Rxe2 2.Rd8+ *
+
+[Event "0757 55800"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "8/8/P3k3/6RK/8/3q4/8/8 b KQkq - 0 1"]
+
+1...Qxa6 2.Rg6+ *
+
+[Event "0759 04586"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "8/8/3k4/R7/b3K3/7r/8/8 w KQkq - 0 1"]
+
+1.Rxa4 Rh4+ *
+
+[Event "0760 04075"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "5k2/1p3p1p/p3q3/8/7P/1P2QP2/6PK/8 w KQkq - 0 1"]
+
+1.Qxe6 fxe6 *
+
+[Event "0771 33921"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "8/8/5k2/5n2/6K1/8/6p1/7Q w KQkq - 0 1"]
+
+1.Qxg2 Ne3+ *
+
+[Event "0773 28744"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "7k/6p1/7p/8/8/Q5nP/5PP1/2r3K1 w KQkq - 0 1"]
+
+1.Qxc1 Ne2+ *
+
+[Event "0775 39893"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "4k2r/3p1pp1/4p2p/P3P3/2r2P1B/6R1/5bPP/5R1K w KQkq - 0 1"]
+
+1.Rxf2 Rc1+ *
+
+[Event "0775 42739"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "3r4/5ppp/1p1k4/p2P4/5P2/1P6/P4PKP/2R5 b KQkq - 0 1"]
+
+1...Kxd5 2.Rd1+ *
+
+[Event "0778 06680"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "8/p6p/1p4k1/3p1qp1/3P4/5Q1P/PP3PK1/8 w KQkq - 0 1"]
+
+1.Qxf5+ Kxf5 *
+
+[Event "0778 05377"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "8/2p3pp/bp1p4/p4k2/P1P2P2/6P1/2P4P/3NK3 b KQkq - 0 1"]
+
+1...Bxc4 2.Ne3+ *
+
+[Event "0779 12776"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "2rQ2k1/5ppp/q3pn2/p7/Pp6/1N4P1/1P2PP1P/3R2K1 b KQkq - 0 1"]
+
+1...Rxd8 2.Rxd8+ *
+
+[Event "0786 31803"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "5rk1/5p1p/p1N1pnp1/1p6/8/6P1/PP2PP1P/2R3K1 b KQkq - 0 1"]
+
+1...Rc8 2.Ne7+ *
+
+[Event "0786 64927"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "8/5pk1/8/6p1/2rR2P1/4PK2/5P2/8 b KQkq - 0 1"]
+
+1...Rxd4 2.exd4 *
+
+[Event "0801 26800"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "8/4kppp/P1pp4/8/3b4/2B4P/2P2PP1/6K1 b KQkq - 0 1"]
+
+1...Bxc3 2.a7 *
+
+[Event "0806 20611"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "5k2/7p/2N1p1p1/2p5/1b2P3/3P2P1/6KP/8 w KQkq - 0 1"]
+
+1.Nxb4 cxb4 *
+
+[Event "0806 21832"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "8/6k1/p7/8/pR1K4/6r1/1P6/8 w KQkq - 0 1"]
+
+1.Rxa4 Rg4+ *
+
+[Event "0807 36952"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "solver"]
+[Black "?"]
+[Result "*"][SetUp "1"]
+[FEN "2r3k1/p3pp1p/5bpB/8/2q5/5PP1/P3QP1P/2R3K1 b KQkq - 0 1"]
+
+1...Qxe2 2.Rxc8# *
