@@ -230,18 +230,25 @@ class ChessEngine:
         """Check if the game is over."""
         return self.board.is_game_over()
     
-    def get_result(self) -> str:
-        """Get the game result if the game is over."""
-        if not self.board.is_game_over():
-            return "Game in progress"
+
+    def get_winner(self) -> str:
+        """Get the game result if the game is over.
         
-        if self.board.is_checkmate():
-            return "1-0" if self.board.turn == chess.BLACK else "0-1"
-        elif self.board.is_stalemate() or self.board.is_insufficient_material() or self.board.is_seventyfive_moves():
-            return "1/2-1/2"
-        else:
-            return "Unknown result"
-    
+        Returns:
+            "white" if white won,
+            "black" if black won,
+            "draw" if the game ended in a draw,
+            or "game not over" if the game is still in progress.
+        """
+        if not self.board.is_game_over():
+            return "game not over"
+
+        outcome = self.board.outcome()
+        # outcome.winner is True for white, False for black, and None for a draw.
+        if outcome is None or outcome.winner is None:
+            return "draw"
+        return "white" if outcome.winner else "black"
+
     def get_board_visual(self) -> str:
         """Return a text representation of the board."""
         return str(self.board)

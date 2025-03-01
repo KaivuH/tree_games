@@ -11,6 +11,7 @@ import math
 from chess_engine.analysis import stockfish_evaluate
 from chess_engine.opening_positions import OPENING_POSITIONS, get_random_opening
 import chess
+import time
 
 logging.basicConfig(
     level=logging.INFO,
@@ -287,7 +288,7 @@ class Game:
                 break
                 
         # Save PGN file before returning result
-        return self.env.get_result()
+        return self.env.get_winner()
 
 
 
@@ -765,7 +766,8 @@ async def main():
 
 async def run_scaling_experiment(
     model_interface,         # Instance of ModelInterface
-    opening_name: str = "random"
+    opening_name: str = "random",
+    depth=True
 ) -> Dict[int, Dict[str, int]]:
     """
     Runs a series of games asynchronously to evaluate the effect of scaling the tree search
@@ -790,51 +792,57 @@ async def run_scaling_experiment(
 
     overall_results = {}
     best_model_width = 2
-    best_model_depth = 2
+    best_model_depth = 1
 
 
     # First sweep depth with fixed width
     fixed_width = 2
-    for depth in range(0, 4):
-        tasks = []
-        
-        # Run 15 games concurrently for this depth
-        for i in range(10):
-            game_board = core.ChessEngine()
-            game_instance = Game(game_board, model_interface, "", opening_name=opening_name)
-            tasks.append(game_instance.play_full_game(player_1_depth=depth, player_1_width=fixed_width, player_2_depth=best_model_depth, player_2_width=best_model_width))
-
-        # Process results as they complete
-        for coro in asyncio.as_completed(tasks):
-            result = await coro
-            result_upper = result.upper()
+    start = time.time()
+    if depth:
+        for depth in range(0, 4):
+            tasks = []
             
-            # Save result to file immediately
-            with open(f"depth_sweep_results.txt", "a") as f:
-                f.write(f"Depth: {depth}, Width: {fixed_width}, Result: {result}\n")
+            # Run 15 games concurrently for this depth
+            for i in range(20):
+                game_board = core.ChessEngine()
+                game_instance = Game(game_board, model_interface, "", opening_name=opening_name)
+                tasks.append(game_instance.play_full_game(player_1_depth=depth, player_1_width=fixed_width, player_2_depth=best_model_depth, player_2_width=best_model_width))
 
-        logging.info(f"Done with {depth}, {fixed_width}")
-    # Then sweep width with best depth
-    fixed_depth = 2
-    for width in range(1, 5):
-        tasks = []
-        
-        # Run 15 games concurrently for this width
-        for i in range(10):
-            game_board = core.ChessEngine()
-            game_instance = Game(game_board, model_interface, "", opening_name=opening_name)
-            tasks.append(game_instance.play_full_game(player_1_depth=fixed_depth, player_1_width=width, player_2_depth=best_model_depth, player_2_width=best_model_width))
+            # Process results as they complete
+            for coro in asyncio.as_completed(tasks):
+                result = await coro
+                result_upper = result.upper()
+                
+                # Save result to file immediately
+                with open(f"depth_sweep_results.txt", "a") as f:
+                    f.write(f"Depth: {depth}, Width: {fixed_width}, Result: {result}\n")
+            print(time.time() - start)
+            start = time.time()
+            logging.info(f"Done with {depth}, {fixed_width}")
 
-        # Process results as they complete  
-        for coro in asyncio.as_completed(tasks):
-            result = await coro
-            result_upper = result.upper()
+    else:
+        # Then sweep width with best depth
+        fixed_depth = 2
+
+        for width in range(1, 5):
+            tasks = []
             
-            # Save result to file immediately
-            with open(f"width_sweep_results.txt", "a") as f:
-                f.write(f"Depth: {fixed_depth}, Width: {width}, Result: {result}\n")
+            # Run 15 games concurrently for this width
+            for i in range(20):
+                game_board = core.ChessEngine()
+                game_instance = Game(game_board, model_interface, "", opening_name=opening_name)
+                tasks.append(game_instance.play_full_game(player_1_depth=fixed_depth, player_1_width=width, player_2_depth=best_model_depth, player_2_width=best_model_width))
 
-        logging.info(f"Done with {fixed_depth}, {width}")
+            # Process results as they complete  
+            for coro in asyncio.as_completed(tasks):
+                result = await coro
+                result_upper = result.upper()
+                
+                # Save result to file immediately
+                with open(f"width_sweep_results.txt", "a") as f:
+                    f.write(f"Depth: {fixed_depth}, Width: {width}, Result: {result}\n")
+
+            logging.info(f"Done with {fixed_depth}, {width}")
     return overall_results
 
 # Example usage:
