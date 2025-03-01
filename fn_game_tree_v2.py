@@ -69,6 +69,7 @@ class ModelInterface:
                         model=self.model_name,
                         max_completion_tokens=self.max_tokens,
                         response_format=output_type,
+                        tools=tools
                     )
                     parsed_obj = response.choices[0].message.parsed
                     result = output_type.model_validate(parsed_obj)
@@ -195,6 +196,115 @@ class Game:
                 break
         return self.env.get_result()
 
+    async def play_full_with_tools(self, tool_budget: int=2) -> str:
+        """
+        Plays a full chess game using tool-augmented LLM moves.
+        Returns the game result as a string.
+        """
+        move_count = 0
+        TOOLS = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_hanging_pieces",
+                    "description": "Find all hanging (undefended) pieces on the current chess board",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function", 
+                "function": {
+                    "name": "get_legal_moves", 
+                    "description": "Get all legal moves in the current position",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "play_move",
+                    "description": "Play a move on the chess board",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "move": {
+                                "type": "string",
+                                "description": "The move in UCI format (e.g. e2e4)"
+                            }
+                        },
+                        "required": ["move"]
+                    }
+                }
+            }
+        }]
+
+        tool_store = {
+            "get_hanging_pieces": self.env.get_hanging_pieces,
+            "get_legal_moves": self.env.get_legal_moves
+        }
+
+        while not self.env.is_game_over() and move_count < 200:  # Prevent infinite games
+            current_player = self.env.get_turn()
+            board_state = str(self.env)
+            
+            messages = [{
+                "role": "user", 
+                "content": (
+                    f"Board state:\n{board_state}\n"
+                    f"You are playing as {current_player}. Make your next move."
+                )
+            }]
+
+            try:
+                for i in range(tool_budget):
+                    response = await self.model.call(
+                        messages,
+                        system_prompt=f"You are playing chess as {current_player}. Use the provided tools to analyze the position to make strong moves. Use the tools before you do your output.",
+                        output_type=Move,
+                        tools=TOOLS
+                    )
+
+                    if response.tool_calls:
+                        tool_call = response.tool_calls[0]
+                        arguments = json.loads(tool_call.function.arguments)
+
+                        if tool_call == "play_move":
+                            action = arguments["move"]
+                            valid = self.env.take_action(action)
+
+                            if not valid:
+                                print(f"Move {action} was invalid. Player {current_player} loses by forfeit.")
+                                return f"Game over. {current_player} loses by forfeit (invalid move)"
+                                
+                            print(f"Move played: {action}")
+                            move_count += 1
+                            break
+                        else:
+                            fn = tool_store[tool_call.function.name]
+                            result = fn()
+                            messages.append({
+                                "role": "user",
+                                "content": f"Model called function {tool_call.function.name}. Output was:\n:{result}"
+                            })
+                            print(messages[-1])
+                    else:
+                        action = response.action
+                        
+                
+            except Exception as e:
+                print(f"Error getting move: {e}")
+                return f"Game over. {current_player} loses by forfeit (error)"
+                
+        return self.env.get_result()
+
     async def play_with_state(
         self, state, history: List[dict], budget: int, 
         root_move: Optional[Move] = None, start: bool = False
@@ -238,7 +348,7 @@ class Game:
                     return (default_move, 0)
 
             else:
-                score = await self.evaluate_state(state, history, root_move)
+                score = await self.evaluate_position_only(state)
             
             return (None, score)
         
@@ -274,7 +384,8 @@ class Game:
             sim_state = state.copy()  # Assumes a proper deep copy.
             # If the move is invalid or the game is over, perform a terminal evaluation.
             if not sim_state.take_action(option.action) or sim_state.is_game_over():
-                evaluation = await self.evaluate_state(sim_state, history + [option.model_dump()], branch_root)
+                #evaluation = await self.evaluate_state(sim_state, history + [option.model_dump()], branch_root)
+                evaluation = await self.evaluate_position_only(sim_state)
                 # Return the option and the Score object (not just the score field)
                 return option, evaluation
             
