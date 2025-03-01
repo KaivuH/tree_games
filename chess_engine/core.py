@@ -235,6 +235,97 @@ class ChessEngine:
         if eval_result.get('best_moves') and len(eval_result['best_moves']) > 0:
             return eval_result['best_moves'][0]['Move']
         return None
+    
+    def get_claude_legal_moves(self, board=None):
+        """
+        Get all legal moves for the current position.
+        
+        Args:
+            board: Optional chess.Board object. If None, uses the current engine board.
+            
+        Returns:
+            A list of legal moves in UCI notation
+        """
+        from . import chess_fns
+        if board is None:
+            board = self.board
+        return chess_fns.get_legal_moves(board)
+    
+    def get_claude_is_check(self, board=None):
+        """
+        Determine if the side to move is in check.
+        
+        Args:
+            board: Optional chess.Board object. If None, uses the current engine board.
+            
+        Returns:
+            Boolean indicating whether the side to move is in check
+        """
+        from . import chess_fns
+        if board is None:
+            board = self.board
+        return chess_fns.is_check(board)
+    
+    def get_claude_attacked_squares(self, side, board=None):
+        """
+        Count the number of squares attacked by a specific side.
+        
+        Args:
+            side: String indicating which side to analyze ('white' or 'black')
+            board: Optional chess.Board object. If None, uses the current engine board.
+            
+        Returns:
+            Integer count of squares attacked by the specified side
+        """
+        from . import chess_fns
+        if board is None:
+            board = self.board
+        return chess_fns.count_attacked_squares(board, side)
+    
+    def get_claude_hanging_pieces(self, board=None):
+        """
+        Identify undefended or hanging pieces on the board.
+        
+        Args:
+            board: Optional chess.Board object. If None, uses the current engine board.
+            
+        Returns:
+            A list of dictionaries with information about hanging pieces
+        """
+        from . import chess_fns
+        if board is None:
+            board = self.board
+        return chess_fns.find_hanging_pieces(board)
+    
+    def get_claude_center_control(self, board=None):
+        """
+        Evaluate control of the center squares (d4, d5, e4, e5).
+        
+        Args:
+            board: Optional chess.Board object. If None, uses the current engine board.
+            
+        Returns:
+            A dictionary with center control metrics
+        """
+        from . import chess_fns
+        if board is None:
+            board = self.board
+        return chess_fns.evaluate_center_control(board)
+    
+    def get_claude_fork_opportunities(self, board=None):
+        """
+        Identify potential fork opportunities for both sides.
+        
+        Args:
+            board: Optional chess.Board object. If None, uses the current engine board.
+            
+        Returns:
+            A list of dictionaries describing potential forks
+        """
+        from . import chess_fns
+        if board is None:
+            board = self.board
+        return chess_fns.detect_fork_opportunities(board)
 
 
 # if __name__ == "__main__":
