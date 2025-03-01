@@ -5,10 +5,17 @@ from typing import List, Dict, Optional, Tuple, Union
 class ChessEngine:
     def __init__(self):
         self.board = chess.Board()
+        self.move_history = []
+
+
+    def __str__(self) -> str:
+        """Return string representation of the current board state."""
+        return str(self.board)
     
     def reset_board(self):
         """Reset the board to starting position."""
         self.board = chess.Board()
+        self.move_history = []
         return self.board
     
     def get_board(self):
@@ -39,13 +46,26 @@ class ChessEngine:
                 return None
         return board_copy
     
-    def execute_move(self, move: Union[str, chess.Move]) -> bool:
+    def take_action(self, move: Union[str, chess.Move]) -> bool:
         """Execute a move on the current board."""
         move_obj = chess.Move.from_uci(move) if isinstance(move, str) else move
         if move_obj in self.board.legal_moves:
             self.board.push(move_obj)
+            self.move_history.append(move_obj)
             return True
         return False
+    
+    def backtrack(self) -> bool:
+        """Undo the last move if possible."""
+        if self.move_history:
+            self.board.pop()
+            self.move_history.pop()
+            return True
+        return False
+    
+    def get_move_history(self) -> List[chess.Move]:
+        """Get the history of moves played."""
+        return self.move_history.copy()
     
     def get_legal_moves(self) -> List[chess.Move]:
         """Get all legal moves for the current position."""

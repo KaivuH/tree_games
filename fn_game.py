@@ -246,7 +246,7 @@ class Game:
                     })
                 
                 elif tool_call.function.name == "take_simulated_action":
-                    c_state = self.env.take_action(arguments)
+                    c_state.take_action(arguments)
                     messages.append({
                         "role": "user",
                         "content": f"Took action {arguments} on game state. New env:\n{str(c_state)}."
@@ -262,11 +262,14 @@ class Game:
                     }]
                 
                 elif tool_call.function.name == "take_action":
-                    c_state = self.env.take_action(arguments)
+                    self.env.take_action(arguments)
                     return arguments
             else:
                 raise "Did not use tools"
+
             messages.append({
                 "role": "user",
                 "content": f"You have {self.comp_budget - i} actions left."
             })
+
+if __name__ == "main":
