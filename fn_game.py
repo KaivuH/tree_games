@@ -120,7 +120,11 @@ class ModelInterface:
         raise last_exception
 
 
-GAME_PROMPT = ""
+GAME_PROMPT = """
+You are a chess AI. You are in a chess environment and you are given affordances to plan before you take your move.
+
+Please use them to explore the space and play against yourself in the simulation before you play against your real opponent. Use them when you need to think Use them when you need to think about the env.
+"""
 
 class Game:
     def __init__(self, env, model, action_signature):
@@ -136,9 +140,9 @@ class Game:
                 "description": f"Jump into a simulated inner model of the action and what its effect would be on the environment.",
                 "parameters": {
                     "type": "object",
-                    "properties": action_signature
+                    "properties": action_signature,
+                    "required": ["uci_action"]
                 },
-                "strict": True
             },
         },
         {
@@ -149,15 +153,13 @@ class Game:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "properties": {
-                            "tool_name": {
-                                "type": "str",
-                                "description": "name of the tool you will use"
-                            },
-                            "function_code": {
-                                "type": "str",
-                                "description": "Code of a python function that computes some property of the environment without modifying the environment. takes in a GameState as argument."
-                            }
+                        "tool_name": {
+                            "type": "string",
+                            "description": "name of the tool you will use"
+                        },
+                        "function_code": {
+                            "type": "string",
+                            "description": "Code of a python function that computes some property of the environment without modifying the environment. takes in a GameState as argument."
                         }
                       },
                     }
@@ -173,7 +175,6 @@ class Game:
                     "type": "object",
                     "properties": {}
                 },
-                "strict": True
             }
         },
         {
@@ -185,7 +186,6 @@ class Game:
                     "type": "object",
                     "properties": action_signature
                 },
-                "strict": True
             }
         }
         ]
@@ -206,7 +206,9 @@ class Game:
 
         for i in range(self.comp_budget):
 
+            print(messages)
             response = await self.model.call(messages, GAME_PROMPT, tools=self.tools)
+            print(response, i)
 
             if response.tool_calls:
                 tool_call = response.tool_calls[0]
@@ -233,7 +235,7 @@ class Game:
                     )
                 
                 elif tool_call.function.name in self.added_functions:
-                    result = eval(self.added_functions[tool_call.function.name])(arguments)
+                    result = eval(self.added_functions[tool_call.function.name])(*arguments)
                     messages.append({
                         "role": "assistant",
                         "content": None,
@@ -247,7 +249,7 @@ class Game:
                     })
                 
                 elif tool_call.function.name == "take_simulated_action":
-                    c_state.take_action(arguments)
+                    c_state.take_action(arguments["action"])
                     messages.append({
                         "role": "user",
                         "content": f"Took action {arguments} on game state. New env:\n{str(c_state)}."
@@ -263,7 +265,7 @@ class Game:
                     }]
                 
                 elif tool_call.function.name == "take_action":
-                    self.env.take_action(arguments)
+                    self.env.take_action(arguments["action"])
                     return arguments
             else:
                 raise "Did not use tools"
@@ -278,8 +280,8 @@ async def main():
     board = core.ChessEngine()
     model_interface = ModelInterface(model_name="o3-mini")
     action_sig = {
-        "uci_action": {
-            "type": "str",
+        "action": {
+            "type": "string",
             "description": "UCI formatted action on board"
         }
     }
