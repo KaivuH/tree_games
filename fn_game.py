@@ -127,7 +127,7 @@ Only communicate via tool calls. ALSO simulate and use the simulation tools befo
 
 This is how you should approach the problem. 
 Take steps and learn the situation of the game/explore outcomes using take_simulated action and only after you have gained enough info go back and take_action. Explore several different moves before you finish.
-Remember you can backtrack if you don't like a current state. before you run out you need to call take_action, maybe in the last budget.
+Remember you can backtrack to explore beyond the current search path. Please backtrack if it's useful. before you run out you need to call take_action, maybe in the last budget.
 
 Simulate the environment using the functions BEFORE you overthink. it's fine to simulate before you overthink.
 """
@@ -235,7 +235,8 @@ class Game:
             "content": f"You are playing a game of chess as {c_state.get_turn()}. Current board state:\n{str(c_state)}\n\nAs {c_state.get_turn()}, you need to analyze the position by making some exploratory moves using take_simulate_action and back_track before committing to your final move. You have {comp_budget} compute budget to explore variations. Use the provided functions to analyze and find the best move."
         }]
 
-        for i in range(self.comp_budget):
+        i = 0
+        while i < self.comp_budget:
 
             response = await self.model.call(messages, GAME_PROMPT, tools=self.tools)
 
@@ -279,7 +280,12 @@ class Game:
                 
                 elif tool_call.function.name == "take_simulated_action":
                     print(arguments['action'])
-                    c_state.take_action(arguments["action"])
+                    result = c_state.take_action(arguments["action"])
+
+                    if not result:
+                        print("Invalid move")
+                        continue
+
                     messages.append({
                         "role": "user",
                         "content": f"Took action {arguments} on game state. New env:\n{str(c_state)}. You are now playing as {c_state.get_turn()}"
@@ -288,6 +294,7 @@ class Game:
                     #result = self.play_from_state(, new_messages)
                 elif tool_call.function.name == "backtrack":
                     # Backtrack to previous state
+                    print("Backtracking...")
                     c_state.backtrack(arguments["n_moves"])
                     messages = messages + [{
                         "role": "user", 
@@ -296,7 +303,11 @@ class Game:
                 
                 elif tool_call.function.name == "take_action":
                     print("Final action", arguments["action"])
-                    print(self.env.take_action(arguments["action"]))
+                    result = self.env.take_action(arguments["action"])
+
+                    if not result:
+                        print("invalid move")
+                        continue
                     return arguments
             else:
                 raise "Did not use tools"
@@ -311,6 +322,7 @@ class Game:
                     "role": "user",
                     "content": f"Now call take_action with the final action based on what you've learned. Take this action on the original board state: {str(self.env)}. Remember that this is not the last state of the simulated game that was to learn. now take an action on the original starting game just given. You are {c_state.get_turn()}"
                 })
+            i += 1
 
     
 
@@ -323,7 +335,7 @@ async def main():
     action_sig = {
         "action": {
             "type": "string",
-            "description": "UCI formatted action on board"
+            "description": "UCI formatted action on board. No Nf3e5 for eg, jut f3e5"
         }
     }
     game = Game(board, model_interface, action_sig)
