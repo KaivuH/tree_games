@@ -11,6 +11,16 @@ import math
 from chess_engine.analysis import stockfish_evaluate
 from chess_engine.opening_positions import OPENING_POSITIONS, get_random_opening
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename="metagame_test.log",
+    filemode="w"
+)
+logger = logging.getLogger(__name__)
+
+
+
 # (Assume openai and chess_engine imports and initialization as before)
 
 class ModelInterface:
@@ -265,7 +275,7 @@ class Game:
                 break
         return self.env.get_result()
 
-    async def play_full_with_tools(self, tool_budget: int=2) -> str:
+    async def play_full_with_tools(self, tool_budget: int=2, use_stockfish_early_stopping=False) -> str:
         """
         Plays a full chess game using tool-augmented LLM moves.
         Returns the game result as a string.
@@ -280,9 +290,11 @@ class Game:
                     "parameters": {
                         "type": "object",
                         "properties": {},
-                        "required": []
-                    }
-                }
+                        "required": [],
+                        "additionalProperties": False
+                    },
+                    "strict": True
+                },
             },
             {
                 "type": "function", 
@@ -292,8 +304,10 @@ class Game:
                     "parameters": {
                         "type": "object",
                         "properties": {},
-                        "required": []
-                    }
+                        "required": [],
+                        "additionalProperties": False
+                    },
+                    "strict": True
                 }
             },
             {
@@ -309,68 +323,134 @@ class Game:
                                 "description": "The move in UCI format (e.g. e2e4)"
                             }
                         },
-                        "required": ["move"]
-                    }
+                        "required": ["move"],
+                        "additionalProperties": False
+                    },
+                    "strict": True
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_fork_candidates",
+                    "description": "Get candidate forks on the board",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                        },
+                        "additionalProperties": False
+                    },
+                    "strict": True
                 }
             }
         ]
 
         tool_store = {
             "get_hanging_pieces": self.env.get_hanging_pieces,
-            "get_legal_moves": self.env.get_legal_moves
+            "get_legal_moves": self.env.get_legal_moves,
+            "get_fork_candidates": self.env.get_fork_candidates
         }
 
         while not self.env.is_game_over() and move_count < 200:  # Prevent infinite games
             current_player = self.env.get_turn()
             board_state = str(self.env)
-            
+
+            if use_stockfish_early_stopping:  # Skip early game positions
+                try:
+                    # Evaluate current position with Stockfish
+                    stockfish_result = stockfish_evaluate(self.env.board, depth=15)
+                    if 'stockfish_eval' in stockfish_result and stockfish_result['stockfish_eval']:
+                        eval_data = stockfish_result['stockfish_eval']
+                        
+                        # Print Stockfish evaluation
+                        logging.info(f"Stockfish evaluation: {eval_data}")
+                        
+                        # Check for overwhelming advantage (more than 3 points)
+                        advantage = 0
+                        
+                        # Extract advantage value from evaluation
+                        if 'type' in eval_data:
+                            if eval_data['type'] == 'cp' and 'value' in eval_data:
+                                advantage = abs(eval_data['value']) / 100.0  # Convert centipawns to pawns
+                            elif eval_data['type'] == 'mate':
+                                advantage = 10.0  # Mate is definitely overwhelming
+                        
+                        # Track imbalance
+                        logging.info(f"Stockfish advantage: {advantage}")
+                        if advantage > 3.0:
+                            self.stockfish_imbalance_count += 1
+                            logging.info(f"Position is imbalanced ({advantage} pawns). Imbalance count: {self.stockfish_imbalance_count}/4")
+                            
+                            # If imbalanced for 4 consecutive positions, end the game
+                            if self.stockfish_imbalance_count >= 4:
+                                # Determine winner based on evaluation
+                                winner = "white" if (eval_data.get('type') == 'cp' and eval_data.get('value', 0) > 0) else "black"
+                                logging.info(f"Game stopped early: {winner.upper()} has overwhelming advantage.")
+                                return winner
+                        else:
+                            # Reset counter if position is balanced
+                            self.stockfish_imbalance_count = 0
+                except Exception as e:
+                    print(f"Error with Stockfish evaluation: {e}")
+                    # Continue with the game despite Stockfish error
+
+            logging.info(board_state)
+            fen = self.env.board.fen()
             messages = [{
-                "role": "user", 
+                "role": "user",
                 "content": (
                     f"Board state:\n{board_state}\n"
+                    f"FEN: {fen}\n"
                     f"You are playing as {current_player}. Make your next move."
                 )
             }]
+            c_tool_budget = tool_budget
+            if current_player == "white":
+                c_tool_budget = 1
 
-            try:
-                for i in range(tool_budget):
-                    response = await self.model.call(
-                        messages,
-                        system_prompt=f"You are playing chess as {current_player}. Use the provided tools to analyze the position to make strong moves. Use the tools before you do your output.",
-                        output_type=Move,
-                        tools=TOOLS
-                    )
+            for i in range(tool_budget):
 
-                    if response.tool_calls:
-                        tool_call = response.tool_calls[0]
-                        arguments = json.loads(tool_call.function.arguments)
+                system_prompt=f"You are playing chess as {current_player}. Use the provided tools to analyze the position to make strong moves. Use the non move tools before you do your output to gather useful information. You have {c_tool_budget - i - 1} non move taking action calls before you need to take an action"
+                logging.info(f"Prompt to model:\n{system_prompt}\n{messages}")
+                response = await self.model.call(
+                    messages,
+                    system_prompt=system_prompt,
+                    tools=TOOLS
+                )
 
-                        if tool_call == "play_move":
-                            action = arguments["move"]
-                            valid = self.env.take_action(action)
+                if response.tool_calls:
+                    tool_call = response.tool_calls[0]
+                    arguments = json.loads(tool_call.function.arguments)
+                    logging.info(tool_call)
 
-                            if not valid:
-                                print(f"Move {action} was invalid. Player {current_player} loses by forfeit.")
-                                return f"Game over. {current_player} loses by forfeit (invalid move)"
-                                
-                            print(f"Move played: {action}")
-                            move_count += 1
-                            break
-                        else:
-                            fn = tool_store[tool_call.function.name]
-                            result = fn()
-                            messages.append({
-                                "role": "user",
-                                "content": f"Model called function {tool_call.function.name}. Output was:\n:{result}"
-                            })
-                            print(messages[-1])
+                    if tool_call.function.name == "play_move":
+                        action = arguments["move"]
+                        valid = self.env.take_action(action)
+
+                        if not valid:
+                            logging.info(f"Move {action} was invalid. Player {current_player} loses by forfeit.")
+                            continue
+                            logging.info("Invalid move")
+                            
+                        logging.info(f"Move played: {action}")
+                        move_count += 1
+                        break
                     else:
-                        action = response.action
-                        
+                        fn = tool_store[tool_call.function.name]
+                        result = fn()
+                        messages.append({
+                            "role": "user",
+                            "content": f"Model called function {tool_call.function.name}. Output was:\n:{result}"
+                        })
+                else:
+                    continue
+                    action = response.action
+                    
                 
-            except Exception as e:
-                print(f"Error getting move: {e}")
-                return f"Game over. {current_player} loses by forfeit (error)"
+            #except Exception as e:
+             #   print(f"Error getting move: {e}")
+              #  return f"Game over. {current_player} loses by forfeit (error)"
+        loggging.info(f"Winner: {self.env.get_result()}")
                 
         return self.env.get_result()
 
@@ -597,7 +677,7 @@ async def main():
     
     # Initialize your chess engine/environment
     board = core.ChessEngine()
-    model_interface = ModelInterface(model_name="o3-mini")
+    model_interface = ModelInterface(model_name="gpt-4o")
     
     # Define the action signature for moves (for documentation purposes)
     action_sig = {
@@ -615,7 +695,43 @@ async def main():
     print(f"Stockfish early stopping: {'Enabled' if use_stockfish_early_stopping else 'Disabled'}")
     print("=" * 50)
     
-    result = await game.play_full_game(comp_budget=comp_budget, use_stockfish_early_stopping=use_stockfish_early_stopping)
+    # Run N games and collect statistics
+    N = 10  # Number of games to play
+    stats = {"white": 0, "black": 0, "draw": 0}
+    
+    # Create tasks for all games
+    tasks = []
+    for i in range(N):
+        # Create a new board and game instance for each parallel task
+        game_board = core.ChessEngine()
+        game_instance = Game(game_board, model_interface, action_sig, opening_name=opening_name)
+        
+        print(f"\nStarting game {i+1}/{N}")
+        tasks.append(game_instance.play_full_with_tools(tool_budget=3, use_stockfish_early_stopping=True))
+    
+    # Run all games in parallel and wait for results
+    results = await asyncio.gather(*tasks)
+    
+    # Process results
+    for i, result in enumerate(results):
+        print(f"\nGame {i+1} complete")
+        # Parse result to determine winner
+        if "WHITE" in result.upper():
+            stats["white"] += 1
+        elif "BLACK" in result.upper():
+            stats["black"] += 1
+        else:
+            stats["draw"] += 1
+            
+        print(f"Current stats - White: {stats['white']}, Black: {stats['black']}, Draw: {stats['draw']}")
+    # Print final statistics
+    print("\nFinal Statistics:")
+    print(f"Total games: {N}")
+    print(f"White wins: {stats['white']} ({stats['white']/N*100:.1f}%)")
+    print(f"Black wins: {stats['black']} ({stats['black']/N*100:.1f}%)")
+    print(f"Draws: {stats['draw']} ({stats['draw']/N*100:.1f}%)")
+   # game = Game(board, model_interface, action_sig)
+    # Play with a computational budget of 3 for black's tree search (white uses direct evaluation)
     print("Game result:", result)
 
 if __name__ == "__main__":

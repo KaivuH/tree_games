@@ -111,7 +111,7 @@ def is_piece_hanging(board: chess.Board, square: chess.Square) -> bool:
         chess.ROOK: 5, 
         chess.QUEEN: 9, 
         chess.KING: 99  # effectively infinite
-    }[piece.piece_type]
+    }
     
     # Find attackers and defenders using built-in methods
     attackers = board.attackers(not piece_color, square)
@@ -124,52 +124,58 @@ def is_piece_hanging(board: chess.Board, square: chess.Square) -> bool:
     # If no defenders, the piece is hanging
     if not defenders:
         return True
+
+def dangers_to_square(board: chess.Board, square: chess.Square, color) -> bool:
+    """
+    Check if a piece on the given square is hanging (undefended or defended 
+    by pieces of higher value)
     
-    # Get the lowest valued attacker
-    attacker_values = []
-    for sq in attackers:
-        piece_at_square = board.piece_at(sq)
-        if piece_at_square is not None:
-            attacker_values.append(piece_value[piece_at_square.piece_type])
+    Args:
+        board: Chess board
+        square: Square to check
+        
+    Returns:
+        True if the piece is hanging, False otherwise
+    """
+    return board.attackers(color, square)
     
-    min_attacker_value = min(attacker_values) if attacker_values else float('inf')
-    
-    # Get the lowest valued defender
-    defender_values = []
-    for sq in defenders:
-        piece_at_square = board.piece_at(sq)
-        if piece_at_square is not None:
-            defender_values.append(piece_value[piece_at_square.piece_type])
-    
-    min_defender_value = min(defender_values) if defender_values else float('inf')
-    
-    # If the best attacker is worth less than the piece being attacked
-    # and there's no adequate defense, the piece is hanging
-    return (min_attacker_value < piece_value and 
-            min_defender_value > min_attacker_value)
 
 def get_hanging_pieces(
     board: chess.Board
-) -> Dict[str, List[Tuple[chess.Square, chess.Piece]]]:
+) -> Dict[str, List[str]]:
     """
-    Find all hanging pieces on the board
+    Find all hanging pieces on the board and return them in a human-readable format.
     
     Args:
         board: Chess board
         
     Returns:
         Dictionary with 'white' and 'black' keys containing lists of 
-        (square, piece) tuples
+        human-readable descriptions of hanging pieces.
     """
     hanging = {'white': [], 'black': []}
     
-    # Efficiently iterate through all pieces on the board
+    # Mapping piece types to readable names
+    piece_names = {
+        chess.PAWN: "Pawn",
+        chess.KNIGHT: "Knight",
+        chess.BISHOP: "Bishop",
+        chess.ROOK: "Rook",
+        chess.QUEEN: "Queen",
+        chess.KING: "King"
+    }
+    
     for square, piece in board.piece_map().items():
         if is_piece_hanging(board, square):
-            color_key = 'white' if piece.color == chess.WHITE else 'black'
-            hanging[color_key].append((square, piece))
+            color = "White" if piece.color == chess.WHITE else "Black"
+            piece_name = piece_names[piece.piece_type]
+            square_name = chess.square_name(square)  # Convert square index to algebraic notation
+            
+            # Example output: "White Knight on e4"
+            hanging[color.lower()].append(f"{color} {piece_name} on {square_name}")
     
     return hanging
+
 
 def get_fork_candidates(board: chess.Board) -> List[Tuple[chess.Square, Set[chess.Square]]]:
     """

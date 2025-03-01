@@ -3,7 +3,7 @@ import chess.svg
 import re
 import random
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
-import analysis
+from . import analysis
 import copy
 
 def load_puzzles_from_pgn(filename):
@@ -122,7 +122,10 @@ class ChessEngine:
     
     def take_action(self, move: Union[str, chess.Move]) -> bool:
         """Execute a move on the current board."""
-        move_obj = chess.Move.from_uci(move) if isinstance(move, str) else move
+        try:
+            move_obj = chess.Move.from_uci(move) if isinstance(move, str) else move
+        except:
+            return False
         if move_obj in self.board.legal_moves:
             self.board.push(move_obj)
             self.move_history.append(move_obj)
