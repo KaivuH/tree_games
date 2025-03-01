@@ -3,7 +3,8 @@ import chess.svg
 import re
 import random
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
-import analysis
+from . import analysis
+import copy
 
 def load_puzzles_from_pgn(filename):
     puzzles = []
@@ -82,6 +83,12 @@ class ChessEngine:
     def __init__(self):
         self.board = chess.Board()
         self.move_history = []
+
+
+
+    def copy(self):
+        return copy.deepcopy(self)
+
 
 
     def __str__(self) -> str:

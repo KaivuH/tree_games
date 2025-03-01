@@ -178,7 +178,7 @@ class Game:
             # Anchor the branch on the candidate move if not already set.
             branch_root = root_move if root_move is not None else option
             sim_state = state.copy()  # Assumes a proper deep copy.
-            if not sim_state.take_action(option.action):
+            if not sim_state.take_action(option.action) or sim_state.is_game_over():
                 # If the move is invalid, return an immediate branch result.
                 return [BranchResult(root_move=branch_root, evaluation=Move(action=option.action, desc="Invalid move"))]
             new_history = history + [option.dict()]
