@@ -131,7 +131,7 @@ class Game:
             "type": "function",
             "function": {
                 "name": "take_simulated_action",
-                "description": f"jump into a simulated inner model of the action and what its effect would be on th enev",
+                "description": f"Jump into a simulated inner model of the action and what its effect would be on the environment.",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -158,11 +158,40 @@ class Game:
                                 "type": "str",
                                 "description": "Code of a python function that computes some property of the environment without modifying the environment. takes in a GameState as argument."
                             }
+                        }
                       },
                     }
                 }
             }
-        }]
+        ,
+        {
+            "type": "function",
+            "function": {
+                "name": "backtrack",
+                "description": "Go back to the previous state in the environment",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                },
+                "strict": True
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "take_action", 
+                "description": "Take a real action in the environment (not simulated)",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        action_signature
+                    }
+                },
+                "strict": True
+            }
+        }
+        ]
+
         self.added_functions = {}
 
 
@@ -172,10 +201,10 @@ class Game:
         self.play_from_state(self.state)
 
 
-    def play_from_state(self, state, messages=[]):
+    def play_from_state(self, messages=[]):
+        c_state = self.env.clone()
+        for i in range(self.comp_budget):
 
-
-        for _ in range(self.comp_budget):
             response = self.model.call(messages, GAME_PROMPT, tools=self.tools)
 
             if response.tool_calls:
@@ -217,22 +246,27 @@ class Game:
                     })
                 
                 elif tool_call.function.name == "take_simulated_action":
-                    new_state = self.env.take_action(arguments)
-                    new_messages = messages + {
+                    c_state = self.env.take_action(arguments)
+                    messages.append({
                         "role": "user",
-                        "content": f"Took action {arguments} on game state."
-                    }
-                    result = self.play_from_state(new_state, new_messages)
-
-                    messages.append({
-                        "role": "assistant", 
-                        "content": None,
-                        "tool_calls": [tool_call]
+                        "content": f"Took action {arguments} on game state. New env:\n{str(c_state)}."
                     })
 
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "name": tool_call.function.name,
-                        "content": str(result)
-                    })
+                    #result = self.play_from_state(, new_messages)
+                elif tool_call.function.name == "backtrack":
+                    # Backtrack to previous state
+                    c_state.backtrack()
+                    messages = messages + [{
+                        "role": "user", 
+                        "content": f"Backtracked to previous state. Current env:\n{str(c_state)}."
+                    }]
+                
+                elif tool_call.function.name == "take_action":
+                    c_state = self.env.take_action(arguments)
+                    return arguments
+            else:
+                raise "Did not use tools"
+            messages.append({
+                "role": "user",
+                "content": f"You have {self.comp_budget - i} actions left."
+            })
