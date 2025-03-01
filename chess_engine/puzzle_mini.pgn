@@ -1,0 +1,10 @@
+[Event "0708 49919"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "solver"]
+[Result "*"][SetUp "1"]
+[FEN "2kr4/1p1r1p2/2p1p2p/8/P1P1Rp2/8/1P3PPP/R5K1 w KQkq - 0 1"]
+
+1.Rxf4 Rd1+ 2.Rxd1 Rxd1# *

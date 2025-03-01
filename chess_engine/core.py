@@ -1,7 +1,8 @@
 import chess
 import chess.svg
 
-from typing import List, Dict, Optional, Tuple, Union
+from typing import List, Dict, Optional, Tuple, Union, Set, Any
+import analysis
 
 class ChessEngine:
     def __init__(self):
@@ -91,3 +92,51 @@ class ChessEngine:
         """Return the current turn (white or black)."""
         return "white" if self.board.turn == chess.WHITE else "black"
     
+    def get_hanging_pieces(self) -> Dict[str, List[Tuple[chess.Square, chess.Piece]]]:
+        """Find all hanging pieces on the current board."""
+        return analysis.get_hanging_pieces(self.board)
+    
+    def is_piece_hanging(self, square: Union[str, chess.Square]) -> bool:
+        """Check if a piece on the given square is hanging."""
+        if isinstance(square, str):
+            # Convert algebraic notation (e.g., 'e4') to square
+            square = chess.parse_square(square)
+        return analysis.is_piece_hanging(self.board, square)
+    
+    def get_fork_candidates(self) -> List[Tuple[chess.Square, Set[chess.Square]]]:
+        """Find potential fork situations on the current board."""
+        return analysis.get_fork_candidates(self.board)
+    
+    def get_pins(self) -> List[
+        Tuple[chess.Square, chess.Square, chess.Square]
+    ]:
+        """Find all pins on the current board."""
+        return analysis.get_pins(self.board)
+    
+    def get_discover_check_candidates(self) -> List[chess.Square]:
+        """Find pieces that could deliver a discovered check if moved."""
+        return analysis.check_discover_check_candidates(self.board)
+    
+    def evaluate_position(self) -> Dict[str, Any]:
+        """Evaluate the current position using multiple metrics."""
+        return analysis.evaluate_position(self.board)
+    
+    def get_material_balance(self) -> int:
+        """Get the material balance in centipawns (+ve means white advantage)."""
+        return analysis.material_balance(self.board)
+    
+    # def load_board_from_pgn(self, pgn: str) -> chess.Board:
+    #     """Load a chess board from PGN format."""
+    #     game = chess.pgn.read_game(io.StringIO(pgn))
+    #     board = game.end().board()
+    #     self.board = board
+    #     self.move_history = list(game.mainline_moves())
+    #     return board
+
+    
+
+if __name__ == "__main__":
+    # Check if a specific piece is hanging
+    engine = ChessEngine()
+    engine.board = chess.Board("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4")
+    print(engine.board)
