@@ -2,6 +2,9 @@ import openai
 from openai import AsyncOpenAI
 from typing import Optional, List, Any, Tuple, Type, Union, Dict
 import os
+from pydantic import BaseModel
+import logging
+import asyncio
 
 
 class ModelInterface:
@@ -26,7 +29,6 @@ class ModelInterface:
             api_key=api_key or os.environ.get("OPENAI_KEY"),
             organization=os.environ.get("OPENAI_ORG"),
         )
-        self.uses_openai = True
 
 
     def _format_messages(
@@ -114,33 +116,62 @@ class ModelInterface:
 
         raise last_exception
 
-    def call_hf(
-        self, formatted_prompt: str, max_length: int = 1000, temp: float = 0.7
-    ) -> str:
-        """
-        Calls a huggingface model with text-generation pipeline.
-        """
-        pipe = pipeline(
-            "text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer,
-        )
-        generation_args = {
-            "max_new_tokens": max_length,
-            "return_full_text": False,
-            "temperature": temp,
-            "do_sample": True,
-            "pad_token_id": self.tokenizer.eos_token_id,
-        }
-        output = pipe(formatted_prompt, **generation_args)
-        return output[0]["generated_text"]
 
-
-
+GAME_PROMPT = ""
 
 class Game:
-
-    def __init__(self, env, model):
+    def __init__(self, env, model, action_signature):
         self.env = env
         self.model = model
+        self.leaves = set()
+        self.tools = [{
+            "type": "function",
+            "function": {
+                "name": "take_simulated_action",
+                "description": f"jump into a simulated inner model of the action and what its effect would be on th enev",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        action_signature
+                    }
+                },
+                "strict": True
+            },
+        },
+        {
+            "type": "function", 
+            "function": {
+                "name": "create_new_tool",
+                "description": "Create a new tool/abstraction to interact with the environment. Given your knowledge of the environment you can create tools that allow you to save on general computations/things to do in the env"
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "properties": {
+                            "tool_name": {
+                                "type": "str",
+                                "description": "name of the tool you will use"
+                            },
+                            "function_code": {
+                                "type": "str",
+                                "description": "Code of a python function that computes some property of the environment without modifying the environment. takes in a GameState as argument."
+                            }
+                      },
+                    }
+                }
+            }
+        }]
+
+
+    def play(self, comp_budget: int):
+        # todo: for now, naive understanding of compute
+        
+        messages = []
+        tools = []
+
+
+        for _ in range(comp_budget):
+            action = self.model.call(messages, GAME_PROMPT, tools=tools)
+            
+
+
 
