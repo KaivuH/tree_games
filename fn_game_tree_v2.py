@@ -10,11 +10,12 @@ import math
 # Import for Stockfish evaluation and opening positions
 from chess_engine.analysis import stockfish_evaluate
 from chess_engine.opening_positions import OPENING_POSITIONS, get_random_opening
+import chess
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    filename="metagame_test.log",
+    filename="tree_search.log",
     filemode="w"
 )
 logger = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class ModelInterface:
         system_prompt: str = "You are a helpful assistant.",
         output_type: Optional[Type[BaseModel]] = None,
         max_retries: int = 3,
-        tools: Optional[Dict[str, Any]] = None,
+        tools: Optional[Dict[str, Any]] = [],
     ) -> Union[str, BaseModel]:
         """
         Calls the LLM using OpenAI's chat completion or HF, returning either raw text
@@ -133,6 +134,7 @@ class Score(BaseModel):
 class Game:
     def __init__(self, env, model, action_signature: Dict[str, Any], opening_name: Optional[str] = None):
         self.env = env
+        self.start_board = env.board.copy()
         self.model = model
         self.action_signature = action_signature
         self.env.comp_budget = 0  # Initialize comp_budget
@@ -157,7 +159,7 @@ class Game:
             self.env.board = self.env.create_board_from_fen(fen)
             print(self.env.get_board_visual())
 
-    async def play_full_game(self, comp_budget: int, use_stockfish_early_stopping: bool = True):
+    async def play_full_game(self, player_1_depth: int, player_1_width: int, use_stockfish_early_stopping: bool = True, player_2_depth=0, player_2_width=0):
         """
         Play a full game by evaluating moves in parallel until the game is over.
         
@@ -166,66 +168,76 @@ class Game:
             use_stockfish_early_stopping: Whether to use Stockfish for early stopping when game is imbalanced
         """
         move_count = 1
+        # Initialize move history
+        
         while not self.env.is_game_over():
+
+
             current_player = self.env.get_turn()
-            print(f"\nMove {move_count}: {current_player.upper()} to play")
-            print("Current board:")
-            print(str(self.env))  # Print the current board state
-            print("-" * 40)
+            logging.info(f"\nMove {move_count}: {current_player.upper()} to play")
+            logging.info("Current board:")
+            logging.info(str(self.env))  # Print the current board state
             
             # Evaluate position with Stockfish if early stopping is enabled
-            if use_stockfish_early_stopping and move_count > 10:  # Skip early game positions
-                try:
-                    # Evaluate current position with Stockfish
-                    stockfish_result = stockfish_evaluate(self.env.board, depth=15)
-                    if 'stockfish_eval' in stockfish_result and stockfish_result['stockfish_eval']:
-                        eval_data = stockfish_result['stockfish_eval']
+            try:
+                # Evaluate current position with Stockfish
+                stockfish_result = stockfish_evaluate(self.env.board, depth=15)
+                if 'stockfish_eval' in stockfish_result and stockfish_result['stockfish_eval']:
+                    eval_data = stockfish_result['stockfish_eval']
+                    
+                    # Print Stockfish evaluation
+                    logging.info(f"Stockfish evaluation: {eval_data}")
+                    
+                    # Check for overwhelming advantage (more than 3 points)
+                    advantage = 0
+                    
+                    # Extract advantage value from evaluation
+                    if 'type' in eval_data:
+                        if eval_data['type'] == 'cp' and 'value' in eval_data:
+                            advantage = abs(eval_data['value']) / 100.0  # Convert centipawns to pawns
+                        elif eval_data['type'] == 'mate':
+                            advantage = 10.0  # Mate is definitely overwhelming
+                    
+                    # Track imbalance
+                    logging.info(f"Stockfish advantage: {advantage}")
+                    if advantage > 3.0 and use_stockfish_early_stopping:
+                        self.stockfish_imbalance_count += 1
+                        logging.info(f"Position is imbalanced ({advantage} pawns). Imbalance count: {self.stockfish_imbalance_count}/4")
                         
-                        # Print Stockfish evaluation
-                        print(f"Stockfish evaluation: {eval_data}")
-                        
-                        # Check for overwhelming advantage (more than 3 points)
-                        advantage = 0
-                        
-                        # Extract advantage value from evaluation
-                        if 'type' in eval_data:
-                            if eval_data['type'] == 'cp' and 'value' in eval_data:
-                                advantage = abs(eval_data['value']) / 100.0  # Convert centipawns to pawns
-                            elif eval_data['type'] == 'mate':
-                                advantage = 10.0  # Mate is definitely overwhelming
-                        
-                        # Track imbalance
-                        if advantage > 3.0:
-                            self.stockfish_imbalance_count += 1
-                            print(f"Position is imbalanced ({advantage} pawns). Imbalance count: {self.stockfish_imbalance_count}/4")
+                        # If imbalanced for 4 consecutive positions, end the game
+                        if self.stockfish_imbalance_count >= 4:
+                            # Determine winner based on evaluation
+                            winner = "white" if (eval_data.get('type') == 'cp' and eval_data.get('value', 0) > 0) else "black"
+                            logging.info(f"Game stopped early: {winner.upper()} has overwhelming advantage.")
                             
-                            # If imbalanced for 4 consecutive positions, end the game
-                            if self.stockfish_imbalance_count >= 4:
-                                # Determine winner based on evaluation
-                                winner = "white" if (eval_data.get('type') == 'cp' and eval_data.get('value', 0) > 0) else "black"
-                                print(f"Game stopped early: {winner.upper()} has overwhelming advantage.")
-                                return f"Game stopped early. {winner.upper()} wins by overwhelming advantage."
-                        else:
-                            # Reset counter if position is balanced
-                            self.stockfish_imbalance_count = 0
-                except Exception as e:
-                    print(f"Error with Stockfish evaluation: {e}")
-                    # Continue with the game despite Stockfish error
+                            # Save PGN before returning
+                            return winner
+                    else:
+                        # Reset counter if position is balanced
+                        self.stockfish_imbalance_count = 0
+            except Exception as e:
+                print(f"Error with Stockfish evaluation: {e}")
+                # Continue with the game despite Stockfish error
             
-            # Set compute budget - only black uses tree search, white uses direct evaluation
-            current_budget = comp_budget if current_player == "black" else 0
-            self.env.comp_budget = current_budget  # Store for reference in other methods
             
             # Use the recursive parallel search method for black, direct evaluation for white
-            result = await self.play_with_state(self.env.copy(), [], current_budget, start=True)
+            if current_player == "black":
+                width = player_1_width
+                depth = player_1_depth
+            else:
+                width = player_2_width 
+                depth = player_2_depth
+                
+            result = await self.play_with_state(self.env.copy(), [], width=width, depth=depth, start=True)
             best_move, score = result
-            print(f"Decision score for {current_player} is {score}")
+            logging.info(f"Decision score for {current_player} is {score}")
             # Apply the final chosen move on the actual environment.
             action = best_move.action if best_move and hasattr(best_move, 'action') else None
 
             if action:
                 try:
                     valid = self.env.take_action(action)
+                    move_count += 1
                 except Exception as e:
                     print(f"Error with move format: {action}. Error: {e}")
                     valid = False
@@ -235,7 +247,7 @@ class Game:
                     legal_moves_uci = [move.uci() for move in legal_moves]  # Convert to UCI strings
                     legal_moves_str = ", ".join(legal_moves_uci[:10])  # Show first 10 moves
                     
-                    print(f"Move {action} was invalid. Valid moves include: {legal_moves_str}" + 
+                    logging.info(f"Move {action} was invalid. Valid moves include: {legal_moves_str}" + 
                           ("..." if len(legal_moves) > 10 else ""))
                     
                     # One more chance with the valid moves list
@@ -259,21 +271,25 @@ class Game:
                         valid = self.env.take_action(action)
                         
                         if not valid:
-                            print(f"Second move {action} was also invalid. Player loses by forfeit.")
-                            return f"Game over. {current_player} loses by forfeit (two invalid moves)"
+                            logging.info(f"Second move {action} was also invalid. Player loses by forfeit.")
+                            return "white" if current_player == "black" else "black"
                         
                         print(f"Final action taken: {action}")
                         move_count += 1
                     except Exception as e:
-                        print(f"Error getting second move: {e}")
-                        return f"Game over. {current_player} loses by forfeit (error getting move)"
+                        logging.info(f"Error getting second move: {e}")
+                        return "white" if current_player == "black" else "black"
                 else:
-                    print(f"Final action taken: {action}")
+                    logging.info(f"Final action taken: {action}")
                     move_count += 1
             else:
-                print("No valid action found.")
+                logging.info("No valid action found.")
                 break
+                
+        # Save PGN file before returning result
         return self.env.get_result()
+
+
 
     async def play_full_with_tools(self, tool_budget: int=2, use_stockfish_early_stopping=False) -> str:
         """
@@ -450,12 +466,12 @@ class Game:
             #except Exception as e:
              #   print(f"Error getting move: {e}")
               #  return f"Game over. {current_player} loses by forfeit (error)"
-        loggging.info(f"Winner: {self.env.get_result()}")
+        logging.info(f"Winner: {self.env.get_result()}")
                 
         return self.env.get_result()
 
     async def play_with_state(
-        self, state, history: List[dict], budget: int, 
+        self, state, history: List[dict], width: int, depth: int,
         root_move: Optional[Move] = None, start: bool = False
     ) -> Tuple[Optional[Move], Union[Score, float]]:
         """
@@ -464,13 +480,13 @@ class Game:
         At the root (start=True), aggregates branch evaluations and returns the final Move.
         """
         # Base case: no compute budget left. Evaluate the state.
-        if budget <= 0:
+        if depth <= 0:
             if start:
                 player = state.get_turn()
                 messages = [{
                     "role": "user",
                     "content": (
-                        f"Board state:\n{str(state)}\n"
+                        f"Board state:\n{str(state.board.fen())}\n"
                         f"IMPORTANT: You are playing as {player}. "
                         "Given the objective (win the game), return the best move and evaluate the board position. "
                         "You MUST provide your move in UCI format like 'e2e4', where the first two characters are the source square and the next two are the destination square. "
@@ -481,20 +497,21 @@ class Game:
                     )
                 }]
                 print("Requesting a move with zero budget (direct evaluation)")
-                try:
-                    move = (await self.model.call(
-                        messages, 
-                        system_prompt=f"You are a chess AI providing candidate moves in UCI format (e.g., 'e2e4', 'g1f3'). You are {player}. Positive scores mean good for {player}, negative means bad for {player}.",
-                        output_type=Move
-                    ))
-                    print(f"Got move from model: {move}")
-                    # Return the move object and its score
-                    return (move, move.score or 0)
-                except Exception as e:
-                    print(f"Error getting move: {e}")
+                #try:
+                move = (await self.model.call(
+                    messages, 
+                    system_prompt=f"You are a chess AI providing candidate moves in UCI format (e.g., 'e2e4', 'g1f3'). You are {player}. Positive scores mean good for {player}, negative means bad for {player}.",
+                    output_type=Move
+                ))
+                print(f"Got move from model: {move}")
+                # Return the move object and its score
+                state.take_action(move.action)
+                return (move, await self.evaluate_position_only(state))
+                #except Exception as e:
+                #    print(f"Error getting move: {e}")
                     # If there's an error, create a basic move with e2e4 (standard white opening)
-                    default_move = Move(action="e2e4", desc="Standard opening move", score=0)
-                    return (default_move, 0)
+                 #   default_move = Move(action="e2e4", desc="Standard opening move", score=0)
+                  #  return (default_move, 0)
 
             else:
                 score = await self.evaluate_position_only(state)
@@ -507,9 +524,9 @@ class Game:
             "role": "user",
             "content": (
                 f"History: {history}\n"
-                f"Board state:\n{str(state)}\n"
+                f"Board state:\n{str(state.board.fen())}\n"
                 f"IMPORTANT: You are playing as {player}. "
-                "Given the objective (win the game), list up to 2 candidate moves in UCI format with descriptions. "
+                f"Given the objective (win the game), list up to {width} good candidate moves in UCI format with descriptions. "
                 "UCI must be in the format like 'e2e4' or 'g1f3' where the first two characters are the source square and "
                 "the next two are the destination square. Do NOT use notation like 'Nf3'. Each move MUST be valid. "
                 "Focus on moves that gain material or improve your position. Be especially alert for opportunities to capture valuable pieces like queens."
@@ -531,7 +548,7 @@ class Game:
             # Anchor the branch on the candidate move if not already set.
             branch_root = root_move if root_move is not None else option
             sim_state = state.copy()  # Assumes a proper deep copy.
-            # If the move is invalid or the game is over, perform a terminal evaluation.
+
             if not sim_state.take_action(option.action) or sim_state.is_game_over():
                 #evaluation = await self.evaluate_state(sim_state, history + [option.model_dump()], branch_root)
                 evaluation = await self.evaluate_position_only(sim_state)
@@ -539,7 +556,7 @@ class Game:
                 return option, evaluation
             
             # Print the board after applying this candidate move
-            if budget == self.env.comp_budget and start:  # Only at the top level of search for the original player
+            if start:  # Only at the top level of search for the original player
                 print(f"\n===== Evaluating candidate: {option.action} =====")
                 print(f"Board after {state.get_turn().upper()} plays {option.action}:")
                 print(str(sim_state))
@@ -550,10 +567,10 @@ class Game:
             
             new_history = history + [option.model_dump()]  # Updated to use model_dump() for Pydantic v2
             # Recurse with a reduced budget.
-            result = await self.play_with_state(sim_state, new_history, budget - 1, root_move=branch_root)
+            result = await self.play_with_state(sim_state, new_history, width=width, depth=depth - 1, root_move=branch_root)
             
             # Show opponent's best response (only at the top level)
-            if budget == self.env.comp_budget and start and isinstance(result, tuple) and len(result) == 2:
+            if depth == self.env.comp_budget and start and isinstance(result, tuple) and len(result) == 2:
                 opponent_move, opponent_score = result
                 if opponent_move:
                     print(f"Best response by {sim_state.get_turn().upper()}: {opponent_move.action}")
@@ -618,11 +635,13 @@ class Game:
         Evaluates just the current position without considering history or future moves.
         Returns a Score object with numerical score and explanation.
         """
+        return Score(score=-state.evaluate_board(color=state.get_turn()), explanation="")
+
         player = state.get_turn()
         messages = [{
             "role": "user",
             "content": (
-                f"Board state:\n{str(state)}\n"
+                f"Board state:\n{str(state.board.fen())}\n"
                 f"IMPORTANT: You are playing as {player}. "
                 f"Provide ONLY a position evaluation score in centipawns where POSITIVE means GOOD FOR {player.upper()} and NEGATIVE means BAD FOR {player.upper()}. "
                 f"For example, if you're playing as {player} and have a queen advantage, the score should be around +900. "
@@ -696,7 +715,7 @@ async def main():
     print("=" * 50)
     
     # Run N games and collect statistics
-    N = 10  # Number of games to play
+    N = 1  # Number of games to play
     stats = {"white": 0, "black": 0, "draw": 0}
     
     # Create tasks for all games
@@ -707,7 +726,8 @@ async def main():
         game_instance = Game(game_board, model_interface, action_sig, opening_name=opening_name)
         
         print(f"\nStarting game {i+1}/{N}")
-        tasks.append(game_instance.play_full_with_tools(tool_budget=3, use_stockfish_early_stopping=True))
+        #tasks.append(game_instance.play_full_with_tools(tool_budget=3, use_stockfish_early_stopping=True))
+        tasks.append(game_instance.play_full_game(player_1_depth=3, player_1_width=4))
     
     # Run all games in parallel and wait for results
     results = await asyncio.gather(*tasks)
@@ -734,5 +754,114 @@ async def main():
     # Play with a computational budget of 3 for black's tree search (white uses direct evaluation)
     print("Game result:", result)
 
+    print("saving")
+    pgn = game.env.to_pgn()
+    # Save move history
+    with open("tree_search.pgn", "w") as f:
+        f.write(pgn)
+
+
+
+
+async def run_scaling_experiment(
+    model_interface,         # Instance of ModelInterface
+    opening_name: str = "random"
+) -> Dict[int, Dict[str, int]]:
+    """
+    Runs a series of games asynchronously to evaluate the effect of scaling the tree search
+    (i.e. increasing the computational budget) on win rates against a player with limited search.
+
+    Parameters:
+        budgets: List of integer computational budgets (e.g., [1, 2, 3, 4]) to test.
+        num_games: Number of games to run for each budget setting.
+        model_interface: An instance of ModelInterface to use for move generation.
+        action_sig: The action signature dictionary for moves.
+        opening_name: The name of the opening or starting position (default is "Starting Position").
+
+    Returns:
+        A dictionary mapping each budget to a win statistics dictionary, e.g.:
+            {
+                1: {"white": 5, "black": 3, "draw": 2},
+                2: {"white": 3, "black": 6, "draw": 1},
+                ...
+            }
+    """
+    from chess_engine import core  # Make sure this import matches your project structure
+
+    overall_results = {}
+    best_model_width = 2
+    best_model_depth = 2
+
+
+    # First sweep depth with fixed width
+    fixed_width = 2
+    for depth in range(0, 4):
+        tasks = []
+        
+        # Run 15 games concurrently for this depth
+        for i in range(10):
+            game_board = core.ChessEngine()
+            game_instance = Game(game_board, model_interface, "", opening_name=opening_name)
+            tasks.append(game_instance.play_full_game(player_1_depth=depth, player_1_width=fixed_width, player_2_depth=best_model_depth, player_2_width=best_model_width))
+
+        # Process results as they complete
+        for coro in asyncio.as_completed(tasks):
+            result = await coro
+            result_upper = result.upper()
+            
+            # Save result to file immediately
+            with open(f"depth_sweep_results.txt", "a") as f:
+                f.write(f"Depth: {depth}, Width: {fixed_width}, Result: {result}\n")
+
+        logging.info(f"Done with {depth}, {fixed_width}")
+    # Then sweep width with best depth
+    fixed_depth = 2
+    for width in range(1, 5):
+        tasks = []
+        
+        # Run 15 games concurrently for this width
+        for i in range(10):
+            game_board = core.ChessEngine()
+            game_instance = Game(game_board, model_interface, "", opening_name=opening_name)
+            tasks.append(game_instance.play_full_game(player_1_depth=fixed_depth, player_1_width=width, player_2_depth=best_model_depth, player_2_width=best_model_width))
+
+        # Process results as they complete  
+        for coro in asyncio.as_completed(tasks):
+            result = await coro
+            result_upper = result.upper()
+            
+            # Save result to file immediately
+            with open(f"width_sweep_results.txt", "a") as f:
+                f.write(f"Depth: {fixed_depth}, Width: {width}, Result: {result}\n")
+
+        logging.info(f"Done with {fixed_depth}, {width}")
+    return overall_results
+
+# Example usage:
+# You can call this function from your main async loop.
+#
+# Example:
+# 
+# async def main_experiment():
+#     budgets_to_test = [1, 2, 3, 4]
+#     games_per_budget = 10
+#     
+#     # Assume model_interface and action_sig are already created/defined
+#     results = await run_scaling_experiment(
+#         budgets=budgets_to_test,
+#         num_games=games_per_budget,
+#         model_interface=model_interface,
+#         action_sig=action_sig,
+#         opening_name="Starting Position"
+#     )
+#     
+#     print("Final Experiment Results:")
+#     for budget, stats in results.items():
+#         print(f"Budget {budget}: {stats}")
+#
+# asyncio.run(main_experiment())
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    #asyncio.run(main())
+    model_interface = ModelInterface(model_name="o3-mini")
+    asyncio.run(run_scaling_experiment(model_interface=model_interface))

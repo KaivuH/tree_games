@@ -5,6 +5,7 @@ import random
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
 from . import analysis
 import copy
+from datetime import datetime
 
 def load_puzzles_from_pgn(filename):
     puzzles = []
@@ -89,6 +90,82 @@ class ChessEngine:
     def copy(self):
         return copy.deepcopy(self)
 
+    def evaluate_board(self, color) -> float:
+        """
+        Evaluate the board position based on material for the given color.
+        Returns a score where positive means advantage for the given color.
+        
+        Piece values:
+        - Pawn = 1
+        - Knight = 3
+        - Bishop = 3
+        - Rook = 5
+        - Queen = 9
+        """
+        piece_values = {
+            chess.PAWN: 1,
+            chess.KNIGHT: 3, 
+            chess.BISHOP: 3,
+            chess.ROOK: 5,
+            chess.QUEEN: 9
+        }
+        
+        score = 0
+        
+        # Convert color string to chess.Color
+        eval_color = chess.WHITE if color.lower() == 'white' else chess.BLACK
+        
+        # Calculate material balance
+        for piece_type in piece_values:
+            # Count pieces for the evaluated color
+            own_pieces = len(self.board.pieces(piece_type, eval_color))
+            # Count opponent pieces
+            opp_pieces = len(self.board.pieces(piece_type, not eval_color))
+            # Add to score (positive for own pieces, negative for opponent pieces)
+            score += piece_values[piece_type] * (own_pieces - opp_pieces)
+            
+        return score
+
+    def to_pgn(self) -> str:
+        """
+        Constructs a PGN string from a given starting board and a move history.
+        
+        Parameters:
+            start_board: The chess.Board representing the starting position.
+            moves_history: An iterable of tuples (move_num, player, move) where 
+                        'move' is in UCI format.
+                        
+        Returns:
+            A string containing the PGN.
+        """
+        # Create a new PGN game and add headers.
+        moves_history = self.move_history
+        start_board = self.starting_board
+        game = chess.pgn.Game()
+        game.headers["Event"] = "Game from Move History"
+        game.headers["Site"] = "?"
+        game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
+        game.headers["Round"] = "1"
+        game.headers["White"] = "White"
+        game.headers["Black"] = "Black"
+        game.headers["Result"] = "*"
+        
+        # Use a temporary board initialized with the starting position.
+        board = start_board.copy()
+        node = game
+        
+        # Replay moves from the move history.
+        print(moves_history)
+        for move in moves_history:
+            if move not in board.legal_moves:
+                raise ValueError(f"Illegal move {move} at move in board state {board.fen()}")
+            node = node.add_variation(move)
+            board.push(move)
+        
+        # Convert the PGN game to a string.
+        pgn_str = str(game)
+        return pgn_str
+
 
 
     def __str__(self) -> str:
@@ -107,7 +184,9 @@ class ChessEngine:
     
     def create_board_from_fen(self, fen: str):
         """Create a board from FEN notation."""
-        return chess.Board(fen)
+        board = chess.Board(fen)
+        self.starting_board = copy.deepcopy(board)
+        return board
     
     def apply_move_sequence(self, moves: List[Union[str, chess.Move]]) -> Optional[chess.Board]:
         """Apply a sequence of moves to a copy of the current board."""
