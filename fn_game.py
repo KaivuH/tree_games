@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import logging
 import asyncio
 import json
+import httpx
 
 
 class ModelInterface:
@@ -35,7 +36,7 @@ class ModelInterface:
                 "OpenRouter API key not found. Set OPENROUTER_API_KEY in environment."
             )
 
-        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        #self.base_url = "https://openrouter.ai/api/v1/chat/completions"
 
 
     
@@ -233,9 +234,7 @@ class Game:
                 "description": f"Jump into a simulated inner model of the action and what its effect would be on the environment.",
                 "parameters": {
                     "type": "object",
-                    "properties": {
-                        action_signature
-                    }
+                    "properties": action_signature
                 },
                 "strict": True
             },
@@ -244,7 +243,7 @@ class Game:
             "type": "function", 
             "function": {
                 "name": "create_new_tool",
-                "description": "Create a new tool/abstraction to interact with the environment. Given your knowledge of the environment you can create tools that allow you to save on general computations/things to do in the env"
+                "description": "Create a new tool/abstraction to interact with the environment. Given your knowledge of the environment you can create tools that allow you to save on general computations/things to do in the env",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -282,9 +281,7 @@ class Game:
                 "description": "Take a real action in the environment (not simulated)",
                 "parameters": {
                     "type": "object",
-                    "properties": {
-                        action_signature
-                    }
+                    "properties": action_signature
                 },
                 "strict": True
             }
@@ -297,11 +294,8 @@ class Game:
     def play(self, comp_budget: int):
         # todo: for now, naive understanding of compute
         self.compute_budget = comp_budget
-        self.play_from_state(self.state)
 
-
-    def play_from_state(self, messages=[]):
-        c_state = self.env.clone()
+        c_state = self.env.copy()
         for i in range(self.comp_budget):
 
             response = self.model.call(messages, GAME_PROMPT, tools=self.tools)
@@ -371,4 +365,18 @@ class Game:
                 "content": f"You have {self.comp_budget - i} actions left."
             })
 
-if __name__ == "main":
+if __name__ == "__main__":
+    from chess_engine import core
+
+    board = core.ChessEngine()
+    model_interface = ModelInterface(model_name="o3-mini")
+    action_sig = {
+        "uci_action": {
+            "type": "str",
+            "description": "UCI formatted action on board"
+        }
+    }
+    game = Game(board, model_interface, action_sig)
+    game.play(1)
+    
+

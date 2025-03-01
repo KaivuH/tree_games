@@ -1,5 +1,6 @@
 import chess
 import chess.svg
+
 from typing import List, Dict, Optional, Tuple, Union
 
 class ChessEngine:
@@ -25,15 +26,6 @@ class ChessEngine:
     def create_board_from_fen(self, fen: str):
         """Create a board from FEN notation."""
         return chess.Board(fen)
-    
-    def apply_move(self, move: Union[str, chess.Move]) -> Optional[chess.Board]:
-        """Apply a move to a copy of the current board and return the new board."""
-        move_obj = chess.Move.from_uci(move) if isinstance(move, str) else move
-        if move_obj in self.board.legal_moves:
-            board_copy = self.board.copy()
-            board_copy.push(move_obj)
-            return board_copy
-        return None
     
     def apply_move_sequence(self, moves: List[Union[str, chess.Move]]) -> Optional[chess.Board]:
         """Apply a sequence of moves to a copy of the current board."""
