@@ -396,3 +396,97 @@ def check_discover_check_candidates(board: chess.Board) -> List[chess.Square]:
             candidates.append(blocker_square)
     
     return candidates
+
+def evaluate_position(board: chess.Board) -> Dict[str, Any]:
+    """
+    Evaluate the current position using multiple metrics
+    
+    Args:
+        board: Chess board
+        
+    Returns:
+        Dictionary with various evaluation metrics
+    """
+    eval_dict = {
+        'material_balance': material_balance(board),
+        'white_king_safety': king_safety(board, 'white'),
+        'black_king_safety': king_safety(board, 'black'),
+        'hanging_pieces': get_hanging_pieces(board),
+        'pins': len(get_pins(board)),
+        'forks': len(get_fork_candidates(board))
+    }
+    
+    return eval_dict
+
+def stockfish_evaluate(board: chess.Board, depth: int = 15, time_limit: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Evaluate the current position using Stockfish engine
+    
+    Args:
+        board: Chess board
+        depth: Search depth for Stockfish
+        time_limit: Optional time limit in milliseconds
+        
+    Returns:
+        Dictionary with Stockfish evaluation metrics
+    """
+    from stockfish import Stockfish
+    import os
+    
+    # Try to locate Stockfish binary
+    stockfish_path = None
+    
+    # Common Mac OS locations
+    if os.path.exists("/usr/local/bin/stockfish"):
+        stockfish_path = "/usr/local/bin/stockfish"
+    elif os.path.exists("/opt/homebrew/bin/stockfish"):
+        stockfish_path = "/opt/homebrew/bin/stockfish"
+    
+    # Common Linux locations
+    elif os.path.exists("/usr/bin/stockfish"):
+        stockfish_path = "/usr/bin/stockfish"
+    elif os.path.exists("/usr/local/bin/stockfish"):
+        stockfish_path = "/usr/local/bin/stockfish"
+    
+    try:
+        if stockfish_path:
+            stockfish = Stockfish(path=stockfish_path)
+        else:
+            # Try to use globally installed Stockfish
+            stockfish = Stockfish()
+            
+        # Configure Stockfish
+        stockfish.set_depth(depth)
+        if time_limit:
+            stockfish.set_fen_position(board.fen())
+            
+        # Set parameters for stronger analysis
+        stockfish.update_engine_parameters({
+            "Threads": 4,  # Use more threads for better performance
+            "Hash": 256,   # Use larger hash table (in MB)
+            "MultiPV": 3   # Get top 3 moves
+        })
+        
+        # Set position
+        stockfish.set_fen_position(board.fen())
+        
+        # Get evaluation
+        evaluation = stockfish.get_evaluation()
+        
+        # Get best moves
+        best_moves = stockfish.get_top_moves(3)
+        
+        return {
+            'stockfish_eval': evaluation,
+            'best_moves': best_moves,
+            'depth': depth
+        }
+    except Exception as e:
+        return {
+            'error': str(e),
+            'stockfish_eval': None,
+            'best_moves': None,
+            'depth': depth
+        }
+    
+    

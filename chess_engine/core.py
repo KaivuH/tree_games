@@ -3,7 +3,7 @@ import chess.svg
 import re
 import random
 from typing import List, Dict, Optional, Tuple, Union, Set, Any
-from . import analysis
+import analysis
 import copy
 
 def load_puzzles_from_pgn(filename):
@@ -205,6 +205,34 @@ class ChessEngine:
         """Get the material balance in centipawns (+ve means white advantage)."""
         return analysis.material_balance(self.board)
     
+    def stockfish_evaluate(self, depth: int = 15, time_limit: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Evaluate the current position using Stockfish engine
+        
+        Args:
+            depth: Search depth for Stockfish (higher means stronger but slower analysis)
+            time_limit: Optional time limit in milliseconds
+            
+        Returns:
+            Dictionary with Stockfish evaluation metrics
+        """
+        return analysis.stockfish_evaluate(self.board, depth, time_limit)
+    
+    def get_best_move(self, depth: int = 15) -> Optional[str]:
+        """
+        Get the best move for the current position according to Stockfish
+        
+        Args:
+            depth: Search depth for Stockfish
+            
+        Returns:
+            Best move in UCI format or None if Stockfish is not available
+        """
+        eval_result = self.stockfish_evaluate(depth)
+        if eval_result.get('best_moves') and len(eval_result['best_moves']) > 0:
+            return eval_result['best_moves'][0]['Move']
+        return None
+
 
 # if __name__ == "__main__":
 #     # Check if a specific piece is hanging
