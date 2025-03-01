@@ -433,33 +433,16 @@ def stockfish_evaluate(board: chess.Board, depth: int = 15, time_limit: Optional
     from stockfish import Stockfish
     import os
     
-    # Try to locate Stockfish binary
-    stockfish_path = None
-    
-    # Common Mac OS locations
-    if os.path.exists("/usr/local/bin/stockfish"):
-        stockfish_path = "/usr/local/bin/stockfish"
-    elif os.path.exists("/opt/homebrew/bin/stockfish"):
-        stockfish_path = "/opt/homebrew/bin/stockfish"
-    
-    # Common Linux locations
-    elif os.path.exists("/usr/bin/stockfish"):
-        stockfish_path = "/usr/bin/stockfish"
-    elif os.path.exists("/usr/local/bin/stockfish"):
-        stockfish_path = "/usr/local/bin/stockfish"
+    # Directly use the known Stockfish path
+    stockfish_path = "/opt/homebrew/bin/stockfish"
     
     try:
-        if stockfish_path:
-            stockfish = Stockfish(path=stockfish_path)
-        else:
-            # Try to use globally installed Stockfish
-            stockfish = Stockfish()
+        # Initialize Stockfish with explicit path
+        stockfish = Stockfish(path=stockfish_path)
             
         # Configure Stockfish
         stockfish.set_depth(depth)
-        if time_limit:
-            stockfish.set_fen_position(board.fen())
-            
+        
         # Set parameters for stronger analysis
         stockfish.update_engine_parameters({
             "Threads": 4,  # Use more threads for better performance
@@ -479,11 +462,12 @@ def stockfish_evaluate(board: chess.Board, depth: int = 15, time_limit: Optional
         return {
             'stockfish_eval': evaluation,
             'best_moves': best_moves,
-            'depth': depth
+            'depth': depth,
+            'engine_path': stockfish_path
         }
     except Exception as e:
         return {
-            'error': str(e),
+            'error': f"Error using Stockfish: {str(e)}. Path tried: {stockfish_path}",
             'stockfish_eval': None,
             'best_moves': None,
             'depth': depth

@@ -1,11 +1,15 @@
 import asyncio
 import json
 import os
+import random
 from typing import Optional, List, Dict, Any, Tuple, Union, Type
 import logging
 from pydantic import BaseModel
 from openai import AsyncOpenAI
 import math
+# Import for Stockfish evaluation and opening positions
+from chess_engine.analysis import stockfish_evaluate
+from chess_engine.opening_positions import OPENING_POSITIONS, get_random_opening
 
 # (Assume openai and chess_engine imports and initialization as before)
 
@@ -117,14 +121,40 @@ class Score(BaseModel):
     explanation: str
 
 class Game:
-    def __init__(self, env, model, action_signature: Dict[str, Any]):
+    def __init__(self, env, model, action_signature: Dict[str, Any], opening_name: Optional[str] = None):
         self.env = env
         self.model = model
         self.action_signature = action_signature
         self.env.comp_budget = 0  # Initialize comp_budget
+        self.stockfish_imbalance_count = 0  # Track consecutive imbalanced positions
+        self.previous_evaluations = []  # Keep track of position evaluations
+        
+        # Set up from opening position if specified
+        if opening_name:
+            if opening_name.lower() == "random":
+                name, fen = get_random_opening()
+                print(f"Selected random opening: {name}")
+            else:
+                name = opening_name
+                fen = OPENING_POSITIONS.get(opening_name)
+                if not fen:
+                    print(f"Opening '{opening_name}' not found. Using starting position.")
+                    fen = OPENING_POSITIONS["Starting Position"]
+                    name = "Starting Position"
+                    
+            print(f"Setting up board from opening: {name}")
+            print(f"FEN: {fen}")
+            self.env.board = self.env.create_board_from_fen(fen)
+            print(self.env.get_board_visual())
 
-    async def play_full_game(self, comp_budget: int):
-        """Play a full game by evaluating moves in parallel until the game is over."""
+    async def play_full_game(self, comp_budget: int, use_stockfish_early_stopping: bool = True):
+        """
+        Play a full game by evaluating moves in parallel until the game is over.
+        
+        Args:
+            comp_budget: Computational budget for tree search
+            use_stockfish_early_stopping: Whether to use Stockfish for early stopping when game is imbalanced
+        """
         move_count = 1
         while not self.env.is_game_over():
             current_player = self.env.get_turn()
@@ -132,6 +162,45 @@ class Game:
             print("Current board:")
             print(str(self.env))  # Print the current board state
             print("-" * 40)
+            
+            # Evaluate position with Stockfish if early stopping is enabled
+            if use_stockfish_early_stopping and move_count > 10:  # Skip early game positions
+                try:
+                    # Evaluate current position with Stockfish
+                    stockfish_result = stockfish_evaluate(self.env.board, depth=15)
+                    if 'stockfish_eval' in stockfish_result and stockfish_result['stockfish_eval']:
+                        eval_data = stockfish_result['stockfish_eval']
+                        
+                        # Print Stockfish evaluation
+                        print(f"Stockfish evaluation: {eval_data}")
+                        
+                        # Check for overwhelming advantage (more than 3 points)
+                        advantage = 0
+                        
+                        # Extract advantage value from evaluation
+                        if 'type' in eval_data:
+                            if eval_data['type'] == 'cp' and 'value' in eval_data:
+                                advantage = abs(eval_data['value']) / 100.0  # Convert centipawns to pawns
+                            elif eval_data['type'] == 'mate':
+                                advantage = 10.0  # Mate is definitely overwhelming
+                        
+                        # Track imbalance
+                        if advantage > 3.0:
+                            self.stockfish_imbalance_count += 1
+                            print(f"Position is imbalanced ({advantage} pawns). Imbalance count: {self.stockfish_imbalance_count}/4")
+                            
+                            # If imbalanced for 4 consecutive positions, end the game
+                            if self.stockfish_imbalance_count >= 4:
+                                # Determine winner based on evaluation
+                                winner = "white" if (eval_data.get('type') == 'cp' and eval_data.get('value', 0) > 0) else "black"
+                                print(f"Game stopped early: {winner.upper()} has overwhelming advantage.")
+                                return f"Game stopped early. {winner.upper()} wins by overwhelming advantage."
+                        else:
+                            # Reset counter if position is balanced
+                            self.stockfish_imbalance_count = 0
+                except Exception as e:
+                    print(f"Error with Stockfish evaluation: {e}")
+                    # Continue with the game despite Stockfish error
             
             # Set compute budget - only black uses tree search, white uses direct evaluation
             current_budget = comp_budget if current_player == "black" else 0
@@ -244,7 +313,7 @@ class Game:
                     }
                 }
             }
-        }]
+        ]
 
         tool_store = {
             "get_hanging_pieces": self.env.get_hanging_pieces,
@@ -520,9 +589,16 @@ class Game:
 async def main():
     from chess_engine import core
     import chess
+    
+    # Configuration options (modify these directly)
+    opening_name = "random"  # Use "random" or any opening name from OPENING_POSITIONS
+    comp_budget = 3  # Computational budget for tree search
+    use_stockfish_early_stopping = True  # Enable early stopping with Stockfish
+    
     # Initialize your chess engine/environment
     board = core.ChessEngine()
     model_interface = ModelInterface(model_name="o3-mini")
+    
     # Define the action signature for moves (for documentation purposes)
     action_sig = {
         "action": {
@@ -530,9 +606,16 @@ async def main():
             "description": "UCI formatted move (e.g., 'f3e5')"
         }
     }
-    game = Game(board, model_interface, action_sig)
-    # Play with a computational budget of 3 for black's tree search (white uses direct evaluation)
-    result = await game.play_full_game(comp_budget=3)
+    
+    # Initialize game with chosen opening
+    game = Game(board, model_interface, action_sig, opening_name=opening_name)
+    
+    # Play with specified computational budget
+    print(f"Starting game with computational budget: {comp_budget}")
+    print(f"Stockfish early stopping: {'Enabled' if use_stockfish_early_stopping else 'Disabled'}")
+    print("=" * 50)
+    
+    result = await game.play_full_game(comp_budget=comp_budget, use_stockfish_early_stopping=use_stockfish_early_stopping)
     print("Game result:", result)
 
 if __name__ == "__main__":
