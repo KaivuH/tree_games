@@ -302,12 +302,12 @@ class Game:
                     }]
                 
                 elif tool_call.function.name == "take_action":
-                    print("Final action", arguments["action"])
                     result = self.env.take_action(arguments["action"])
 
                     if not result:
                         print("invalid move")
                         continue
+                    print("Final action", arguments["action"])
                     return arguments
             else:
                 raise "Did not use tools"
