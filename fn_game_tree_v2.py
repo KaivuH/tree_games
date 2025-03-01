@@ -16,7 +16,7 @@ class ModelInterface:
     def __init__(self, model_name: str, api_key: Optional[str] = None, max_tokens: int = 16000):
         self.model_name = model_name
         self.max_tokens = max_tokens
-        self.api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OpenRouter API key not found. Set OPENROUTER_API_KEY in environment.")
         # Assume AsyncOpenAI is set up correctly.
@@ -112,7 +112,7 @@ class Move(BaseModel):
 
 
 class Score(BaseModel):
-    score: int
+    score: float
     explanation: str
 
 class Game:
@@ -120,26 +120,76 @@ class Game:
         self.env = env
         self.model = model
         self.action_signature = action_signature
+        self.env.comp_budget = 0  # Initialize comp_budget
 
     async def play_full_game(self, comp_budget: int):
         """Play a full game by evaluating moves in parallel until the game is over."""
+        move_count = 1
         while not self.env.is_game_over():
             current_player = self.env.get_turn()
-            print("Turn:", current_player)
-            # Set compute budget (could be adapted per player)
+            print(f"\nMove {move_count}: {current_player.upper()} to play")
+            print("Current board:")
+            print(str(self.env))  # Print the current board state
+            print("-" * 40)
+            
+            # Set compute budget - only black uses tree search, white uses direct evaluation
             current_budget = comp_budget if current_player == "black" else 0
-            # Use the new recursive parallel search method
-            result = await self.play_with_state(self.env.copy(), [], current_budget)
-            print(f"Decision score for {current_player} is {result.score}")
+            self.env.comp_budget = current_budget  # Store for reference in other methods
+            
+            # Use the recursive parallel search method for black, direct evaluation for white
+            result = await self.play_with_state(self.env.copy(), [], current_budget, start=True)
+            best_move, score = result
+            print(f"Decision score for {current_player} is {score}")
             # Apply the final chosen move on the actual environment.
-            action = result[1]
+            action = best_move.action if best_move and hasattr(best_move, 'action') else None
 
             if action:
-                valid = self.env.take_action(action)
+                try:
+                    valid = self.env.take_action(action)
+                except Exception as e:
+                    print(f"Error with move format: {action}. Error: {e}")
+                    valid = False
                 if not valid:
-                    print("Final move was invalid. Retrying...")
-                    continue
-                print(f"Final action taken: {action}")
+                    # Get legal moves
+                    legal_moves = self.env.get_legal_moves()
+                    legal_moves_uci = [move.uci() for move in legal_moves]  # Convert to UCI strings
+                    legal_moves_str = ", ".join(legal_moves_uci[:10])  # Show first 10 moves
+                    
+                    print(f"Move {action} was invalid. Valid moves include: {legal_moves_str}" + 
+                          ("..." if len(legal_moves) > 10 else ""))
+                    
+                    # One more chance with the valid moves list
+                    messages = [{
+                        "role": "user",
+                        "content": (
+                            f"Board state:\n{str(self.env)}\n"
+                            f"Your move '{action}' was INVALID. Choose a VALID move from this list: "
+                            f"{', '.join(legal_moves_uci)}\n"
+                            "Return a valid UCI move (e.g., 'e2e4')."
+                        )
+                    }]
+                    
+                    try:
+                        move = await self.model.call(
+                            messages, 
+                            system_prompt=f"You are playing chess as {current_player}. You must choose a valid move.",
+                            output_type=Move
+                        )
+                        action = move.action
+                        valid = self.env.take_action(action)
+                        
+                        if not valid:
+                            print(f"Second move {action} was also invalid. Player loses by forfeit.")
+                            return f"Game over. {current_player} loses by forfeit (two invalid moves)"
+                        
+                        print(f"Final action taken: {action}")
+                        move_count += 1
+                    except Exception as e:
+                        print(f"Error getting second move: {e}")
+                        return f"Game over. {current_player} loses by forfeit (error getting move)"
+                else:
+                    print(f"Final action taken: {action}")
+                    move_count += 1
             else:
                 print("No valid action found.")
                 break
@@ -148,7 +198,7 @@ class Game:
     async def play_with_state(
         self, state, history: List[dict], budget: int, 
         root_move: Optional[Move] = None, start: bool = False
-    ) -> Tuple[Move, Score]:
+    ) -> Tuple[Optional[Move], Union[Score, float]]:
         """
         Recursive tree search that performs MCTS-like rollouts.
         When not at the root (start=False), returns a list of BranchResult objects.
@@ -157,20 +207,35 @@ class Game:
         # Base case: no compute budget left. Evaluate the state.
         if budget <= 0:
             if start:
+                player = state.get_turn()
                 messages = [{
                     "role": "user",
                     "content": (
                         f"Board state:\n{str(state)}\n"
-                        "Given the objective (win the game), return the best move and evaluate the board based on how good the position is for you"
-                        "UCI is for example 'f3e5a'. No Nb stuff."
+                        f"IMPORTANT: You are playing as {player}. "
+                        "Given the objective (win the game), return the best move and evaluate the board position. "
+                        "You MUST provide your move in UCI format like 'e2e4', where the first two characters are the source square and the next two are the destination square. "
+                        "Do NOT use notation like 'Nf3' or 'Qd1b3'. ONLY use simple source-destination format like 'g1f3' for a knight move. "
+                        f"For the score, use a centipawn-like scale where POSITIVE means GOOD FOR {player.upper()} and NEGATIVE means BAD FOR {player.upper()}. "
+                        f"For example, if you're playing as {player} and have a queen advantage, the score should be around +900. "
+                        f"If you're playing as {player} and are down a queen, the score should be around -900."
                     )
                 }]
-                move = (await self.model.call(
-                    messages, 
-                    system_prompt=f"You are a chess AI providing candidate moves that will help you win. You are {state.get_turn()}",
-                    output_type=Move
-                ))
-                return (move.action, move.score)
+                print("Requesting a move with zero budget (direct evaluation)")
+                try:
+                    move = (await self.model.call(
+                        messages, 
+                        system_prompt=f"You are a chess AI providing candidate moves in UCI format (e.g., 'e2e4', 'g1f3'). You are {player}. Positive scores mean good for {player}, negative means bad for {player}.",
+                        output_type=Move
+                    ))
+                    print(f"Got move from model: {move}")
+                    # Return the move object and its score
+                    return (move, move.score or 0)
+                except Exception as e:
+                    print(f"Error getting move: {e}")
+                    # If there's an error, create a basic move with e2e4 (standard white opening)
+                    default_move = Move(action="e2e4", desc="Standard opening move", score=0)
+                    return (default_move, 0)
 
             else:
                 score = await self.evaluate_state(state, history, root_move)
@@ -178,26 +243,30 @@ class Game:
             return (None, score)
         
         # Request candidate moves from the model.
+        player = state.get_turn()
         messages = [{
             "role": "user",
             "content": (
                 f"History: {history}\n"
                 f"Board state:\n{str(state)}\n"
+                f"IMPORTANT: You are playing as {player}. "
                 "Given the objective (win the game), list up to 2 candidate moves in UCI format with descriptions. "
-                "UCI is for example 'f3e5a'. No Nb stuff."
+                "UCI must be in the format like 'e2e4' or 'g1f3' where the first two characters are the source square and "
+                "the next two are the destination square. Do NOT use notation like 'Nf3'. Each move MUST be valid. "
+                "Focus on moves that gain material or improve your position. Be especially alert for opportunities to capture valuable pieces like queens."
             )
         }]
         options = (await self.model.call(
             messages, 
-            system_prompt=f"You are a chess AI providing candidate moves that will help you win. You are {state.get_turn()}",
+            system_prompt=f"You are a chess AI providing candidate moves in UCI format (e.g., 'e2e4', 'g1f3'). You are {player}.",
             output_type=MoveChoices
         )).choices
         print("Candidate options:", options)
     
         if not options:
-            eval_move = await self.evaluate_state(state, history, root_move)
-            anchored = root_move if root_move is not None else eval_move
-            return [BranchResult(root_move=anchored, total_score=eval_move.score or 0, visits=1)]
+            evaluation = await self.evaluate_state(state, history, root_move)
+            # If no options, just return None for the move and the evaluation score
+            return (None, evaluation)
     
         async def simulate_option(option: Move) -> List[BranchResult]:
             # Anchor the branch on the candidate move if not already set.
@@ -205,11 +274,37 @@ class Game:
             sim_state = state.copy()  # Assumes a proper deep copy.
             # If the move is invalid or the game is over, perform a terminal evaluation.
             if not sim_state.take_action(option.action) or sim_state.is_game_over():
-                score = await self.evaluate_state(sim_state, history + [option.dict()], branch_root)
-                return option, score
-            new_history = history + [option.dict()]
+                evaluation = await self.evaluate_state(sim_state, history + [option.model_dump()], branch_root)
+                # Return the option and the Score object (not just the score field)
+                return option, evaluation
+            
+            # Print the board after applying this candidate move
+            if budget == self.env.comp_budget and start:  # Only at the top level of search for the original player
+                print(f"\n===== Evaluating candidate: {option.action} =====")
+                print(f"Board after {state.get_turn().upper()} plays {option.action}:")
+                print(str(sim_state))
+                
+                # Get separate evaluation for this position
+                position_eval = await self.evaluate_position_only(sim_state)
+                print(f"Direct position evaluation after {option.action}: {position_eval.score}")
+            
+            new_history = history + [option.model_dump()]  # Updated to use model_dump() for Pydantic v2
             # Recurse with a reduced budget.
-            return option, self.play_with_state(sim_state, new_history, budget - 1, root_move=branch_root)
+            result = await self.play_with_state(sim_state, new_history, budget - 1, root_move=branch_root)
+            
+            # Show opponent's best response (only at the top level)
+            if budget == self.env.comp_budget and start and isinstance(result, tuple) and len(result) == 2:
+                opponent_move, opponent_score = result
+                if opponent_move:
+                    print(f"Best response by {sim_state.get_turn().upper()}: {opponent_move.action}")
+                    resp_state = sim_state.copy()
+                    if resp_state.take_action(opponent_move.action):
+                        print(f"Board after response {opponent_move.action}:")
+                        print(str(resp_state))
+                    print(f"Score after response: {opponent_score}")
+                    print("=" * 40)
+            
+            return option, result
     
         # Launch simulations in parallel for each candidate.
         tasks = [simulate_option(option) for option in options]
@@ -221,36 +316,90 @@ class Game:
         if state.get_turn() == self.env.get_turn():
             curr_score = -math.inf
             for move, score in results:
-                if score > curr_score:
-                    curr_score = score
+                # Extract score value properly based on type
+                if isinstance(score, tuple):
+                    score_value = score[1]  # Get the second element from tuple
+                elif isinstance(score, Score):
+                    score_value = score.score  # Get the score field from Score object
+                else:
+                    score_value = float(score) if score is not None else 0.0  # Convert to float or default to 0.0
+                
+                # Handle case where score_value is still a Score object
+                if isinstance(score_value, Score):
+                    score_value = score_value.score
+                
+                if score_value > curr_score:
+                    curr_score = score_value
                     b_move = move
         else:
             curr_score = math.inf
             for move, score in results:
-                if score < curr_score:
-                    curr_score = score
+                # Extract score value properly based on type
+                if isinstance(score, tuple):
+                    score_value = score[1]  # Get the second element from tuple
+                elif isinstance(score, Score):
+                    score_value = score.score  # Get the score field from Score object
+                else:
+                    score_value = float(score) if score is not None else 0.0  # Convert to float or default to 0.0
+                
+                # Handle case where score_value is still a Score object
+                if isinstance(score_value, Score):
+                    score_value = score_value.score
+                
+                if score_value < curr_score:
+                    curr_score = score_value
                     b_move = move
     
         print(curr_score, b_move)
         return (b_move, curr_score)
 
-    async def evaluate_state(self, state, history: List[dict], root_move: Optional[Move]) -> Move:
+    async def evaluate_position_only(self, state) -> Score:
+        """
+        Evaluates just the current position without considering history or future moves.
+        Returns a Score object with numerical score and explanation.
+        """
+        player = state.get_turn()
+        messages = [{
+            "role": "user",
+            "content": (
+                f"Board state:\n{str(state)}\n"
+                f"IMPORTANT: You are playing as {player}. "
+                f"Provide ONLY a position evaluation score in centipawns where POSITIVE means GOOD FOR {player.upper()} and NEGATIVE means BAD FOR {player.upper()}. "
+                f"For example, if you're playing as {player} and have a queen advantage, the score should be around +900. "
+                f"If you're playing as {player} and are down a queen, the score should be around -900. "
+                f"Consider material, piece activity, king safety, and pawn structure. "
+                f"Focus ONLY on the current position, not potential future moves."
+            )
+        }]
+        evaluation = await self.model.call(
+            messages,
+            system_prompt=f"Position evaluation only. You are {player}. Positive scores mean good for {player}, negative means bad for {player}.",
+            output_type=Score
+        )
+        return evaluation
+        
+    async def evaluate_state(self, state, history: List[dict], root_move: Optional[Move]) -> Score:
         """
         Terminal evaluation when no compute budget is left.
         Asks the model to evaluate the board state and recommend a move, including a score.
+        Returns a Score object with numerical score and explanation.
         """
+        player = state.get_turn()
         messages = [{
             "role": "user",
             "content": (
                 f"Final board state:\n{str(state)}\n"
                 f"History: {history}\n"
-                "Provide a terminal evaluation and recommend and include an evaluation score between -1 (losing) and 1 (winning). "
-                f"You are {state.get_turn()}"
+                f"IMPORTANT: You are playing as {player}. "
+                f"Provide a terminal evaluation and include an evaluation score in centipawns where POSITIVE means GOOD FOR {player.upper()} and NEGATIVE means BAD FOR {player.upper()}. "
+                f"For example, if you're playing as {player} and have a queen advantage, the score should be around +900. "
+                f"If you're playing as {player} and are down a queen, the score should be around -900. "
+                "Consider material, piece activity, king safety, and other relevant factors."
             )
         }]
         evaluation = await self.model.call(
             messages,
-            system_prompt="Terminal state evaluation.",
+            system_prompt=f"Terminal state evaluation. You are {player}. Positive scores mean good for {player}, negative means bad for {player}.",
             output_type=Score
         )
         return evaluation
@@ -271,6 +420,7 @@ async def main():
         }
     }
     game = Game(board, model_interface, action_sig)
+    # Play with a computational budget of 3 for black's tree search (white uses direct evaluation)
     result = await game.play_full_game(comp_budget=3)
     print("Game result:", result)
 

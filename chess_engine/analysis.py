@@ -126,14 +126,22 @@ def is_piece_hanging(board: chess.Board, square: chess.Square) -> bool:
         return True
     
     # Get the lowest valued attacker
-    min_attacker_value = min(
-        piece_value[board.piece_at(sq).piece_type] for sq in attackers
-    )
+    attacker_values = []
+    for sq in attackers:
+        piece_at_square = board.piece_at(sq)
+        if piece_at_square is not None:
+            attacker_values.append(piece_value[piece_at_square.piece_type])
+    
+    min_attacker_value = min(attacker_values) if attacker_values else float('inf')
     
     # Get the lowest valued defender
-    min_defender_value = min(
-        piece_value[board.piece_at(sq).piece_type] for sq in defenders
-    )
+    defender_values = []
+    for sq in defenders:
+        piece_at_square = board.piece_at(sq)
+        if piece_at_square is not None:
+            defender_values.append(piece_value[piece_at_square.piece_type])
+    
+    min_defender_value = min(defender_values) if defender_values else float('inf')
     
     # If the best attacker is worth less than the piece being attacked
     # and there's no adequate defense, the piece is hanging

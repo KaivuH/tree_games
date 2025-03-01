@@ -134,7 +134,7 @@ class Game:
                 break
         return self.env.get_result()
 
-    async def play_with_state(
+    async def ok play_with_state(
         self, state, history: List[dict], budget: int, root_move: Optional[Move] = None, start: bool = False
     ) -> Union[Move, List[BranchResult]]:
         """
@@ -174,7 +174,7 @@ class Game:
             anchored = root_move if root_move is not None else eval_move
             return [BranchResult(root_move=anchored, evaluation=eval_move)]
     
-        async def simulate_option(option: Move) -> List[BranchResult]:
+    async def simulate_option(option: Move) -> List[BranchResult]:
             # Anchor the branch on the candidate move if not already set.
             branch_root = root_move if root_move is not None else option
             sim_state = state.copy()  # Assumes a proper deep copy.
