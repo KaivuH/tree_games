@@ -9,7 +9,6 @@ load_dotenv()  # This loads the .env file into the environment
 ant_key = os.getenv("ANT_KEY")
 
 import anthropic
-import openai
 
 client = anthropic.AsyncAnthropic()
 # client = openai.AsyncOpenAI()
@@ -155,10 +154,6 @@ propose_new_tool = {
                 "type": "string",
                 "description": "Name of the tool you will use"
             },
-            "tool_name_3": {
-                "type": "string",
-                "description": "Name of the tool you will use"
-            },
             "function_spec_1": {
                 "type": "string",
                 "description": "A detailed description of the function you want to propose, as well as the signature of its outputs. The function should only receive an input which is a 2D array representing the current visible board state, where in the array X represents a hit, O represents a miss, and ~ represents unknown cells."  
@@ -167,10 +162,6 @@ propose_new_tool = {
                 "type": "string",
                 "description": "A detailed description of the function you want to propose, as well as the signature of its outputs. The function should only receive an input which is a 2D array representing the current visible board state, where in the array X represents a hit, O represents a miss, and ~ represents unknown cells."  
             },
-            "function_spec_3": {
-                "type": "string",
-                "description": "A detailed description of the function you want to propose, as well as the signature of its outputs. The function should only receive an input which is a 2D array representing the current visible board state, where in the array X represents a hit, O represents a miss, and ~ represents unknown cells."  
-            }
         },
         "required": ["tool_name_1", "function_spec_1"]
     }
@@ -189,7 +180,7 @@ class BattleshipGame:
         }
         # Initialize two players with their boards and ship placements.
         self.players = [self._initialize_player_board(), self._initialize_player_board()]
-        self.current_player = 1  # Index of the player whose turn it is
+        self.current_player = 0  # Index of the player whose turn it is
         self.tools = [[propose_new_tool], []] # tools available for each player
         self.extra_fns = [{}, {}] # code for extra functions added by each player
 
@@ -340,7 +331,7 @@ class BattleshipGame:
                     if attacker == 0:
                         response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=1024, max_tokens=2000)
                     else:
-                        response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=5000, max_tokens=6000)
+                        response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=4096, max_tokens=5000)
                     print(response)
 
                     if isinstance(response[-1], ToolUseBlock):
@@ -445,4 +436,4 @@ async def main(n):
     print(results)
 
 if __name__ == "__main__":
-    asyncio.run(main(7))
+    asyncio.run(main(1))
