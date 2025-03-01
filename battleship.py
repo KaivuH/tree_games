@@ -189,7 +189,7 @@ class BattleshipGame:
         }
         # Initialize two players with their boards and ship placements.
         self.players = [self._initialize_player_board(), self._initialize_player_board()]
-        self.current_player = 0  # Index of the player whose turn it is
+        self.current_player = 1  # Index of the player whose turn it is
         self.tools = [[propose_new_tool], []] # tools available for each player
         self.extra_fns = [{}, {}] # code for extra functions added by each player
 
@@ -337,7 +337,10 @@ class BattleshipGame:
                     print("full message history:", messages[attacker])
                     print("number of tools available:", len(self.tools[attacker]))
 
-                    response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=1024, max_tokens=2000)
+                    if attacker == 0:
+                        response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=1024, max_tokens=2000)
+                    else:
+                        response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=5000, max_tokens=6000)
                     print(response)
 
                     if isinstance(response[-1], ToolUseBlock):
@@ -442,4 +445,4 @@ async def main(n):
     print(results)
 
 if __name__ == "__main__":
-    asyncio.run(main(1))
+    asyncio.run(main(7))
