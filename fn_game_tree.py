@@ -227,7 +227,7 @@ class Game:
                 f"History: {history}\n"
                 "Provide a terminal evaluation and recommend a final move (in UCI format, e.g., f3e5) with a brief explanation. "
                 "ONLY consider the move proposed at the starting state of this branch. No Nb stuff. "
-                f"You are {state.get_turn()}"
+                f"You are {state.get_turn()}" # POTENTIAL SOURCE OF DANGER
             )
         }]
         evaluation = await self.model.call(
