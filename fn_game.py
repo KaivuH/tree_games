@@ -5,6 +5,7 @@ import os
 from pydantic import BaseModel
 import logging
 import asyncio
+import json
 
 
 class ModelInterface:
@@ -124,7 +125,9 @@ class Game:
         self.env = env
         self.model = model
         self.leaves = set()
-        self.tools = [{
+        self.action_signature = action_signature
+        self.tools = [
+        {
             "type": "function",
             "function": {
                 "name": "take_simulated_action",
@@ -160,18 +163,76 @@ class Game:
                 }
             }
         }]
+        self.added_functions = {}
 
 
     def play(self, comp_budget: int):
         # todo: for now, naive understanding of compute
-        
-        messages = []
-        tools = []
+        self.compute_budget = comp_budget
+        self.play_from_state(self.state)
 
 
-        for _ in range(comp_budget):
-            action = self.model.call(messages, GAME_PROMPT, tools=tools)
-            
+    def play_from_state(self, state, messages=[]):
 
 
+        for _ in range(self.comp_budget):
+            response = self.model.call(messages, GAME_PROMPT, tools=self.tools)
 
+            if response.tool_calls:
+                tool_call = response.tool_calls[0]
+                arguments = json.loads(tool_call.function.arguments)
+                
+                if tool_call.function.name == "create_new_tool":
+                    self.added_functions[arguments["tool_name"]] = arguments["function_code"]
+                    # todo 
+                    self.tools.append(
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": arguments["tool_name"],
+                                "description": f"", #todo put desc
+                                "parameters": {
+                                    "type": "object",
+                                    "properties": {
+                                        self.action_signature
+                                    }
+                                },
+                                "strict": True
+                            },
+                        },
+                    )
+                
+                elif tool_call.function.name in self.added_functions:
+                    result = eval(self.added_functions[tool_call.function.name])(arguments)
+                    messages.append({
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [tool_call]
+                    })
+                    messages.append({
+                        "role": "tool", 
+                        "tool_call_id": tool_call.id,
+                        "name": tool_call.function.name,
+                        "content": str(result)
+                    })
+                
+                elif tool_call.function.name == "take_simulated_action":
+                    new_state = self.env.take_action(arguments)
+                    new_messages = messages + {
+                        "role": "user",
+                        "content": f"Took action {arguments} on game state."
+                    }
+                    result = self.play_from_state(new_state, new_messages)
+
+                    messages.append({
+                        "role": "assistant", 
+                        "content": None,
+                        "tool_calls": [tool_call]
+                    })
+
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "name": tool_call.function.name,
+                        "content": str(result)
+                    })
