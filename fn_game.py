@@ -37,6 +37,7 @@ class ModelInterface:
             )
 
         #self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.client = AsyncOpenAI()
 
 
     
@@ -49,173 +50,74 @@ class ModelInterface:
         """
         return [{"role": "system", "content": system_prompt}] + user_messages
 
+ 
+
     async def call(
         self,
-        messages: List[Dict[str, Any]],
+        messages: List[dict],
         system_prompt: str = "You are a helpful assistant.",
-        temperature: float = 0.7,
-        tools: Optional[List[Dict[str, Any]]] = None,
         output_type: Optional[Type[BaseModel]] = None,
         max_retries: int = 3,
-    ) -> Dict[str, Any]:
+        tools: Optional[Dict[str, Any]] = None,
+    ) -> Union[str, BaseModel]:
         """
-        Make an API call to OpenRouter.
-
-        Args:
-            messages: List of message objects
-            system_prompt: System prompt message
-            temperature: Sampling temperature
-            tools: List of tool definitions
-            output_type: Currently not supported for OpenRouter
-            max_retries: Number of retries on failure
-
-        Returns:
-            API response
+        Calls the LLM using OpenAI's chat completion or HF, returning either raw text
+        or a Pydantic-validated object.
         """
-        # Prepare messages with system prompt
+
+        # Otherwise, if using an OpenAI-based model:
         formatted_messages = self._format_messages(system_prompt, messages)
+        # logging.info("\n=== Model Call (OpenAI) ===")
+        # logging.info("System:", system_prompt)
+        # for msg in messages:
+        #     logging.info(f"{msg['role'].upper()}:", msg['content'])
+        # logging.info("=" * 80)
 
-        # Prepare API request
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "tree_games_chess_demo",  # App identifier
-            "X-Title": "Chess Tree Demo",  # App title
-        }
-
-        payload = {
-            "model": self.model_name,
-            "messages": formatted_messages,
-            "temperature": temperature,
-            "max_tokens": self.max_tokens,
-        }
-
-        if tools:
-            payload["tools"] = tools
-
-        # Make API request with retry logic
         last_exception = None
         for attempt in range(max_retries):
             try:
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(
-                        self.base_url,
-                        headers=headers,
-                        json=payload,
-                        timeout=120.0,  # Extended timeout for LLM responses
+                if output_type is None:
+                    response = await self.client.chat.completions.create(
+                        messages=formatted_messages,
+                        model=self.model_name,
+                        max_completion_tokens=self.max_tokens,
+                        tools=tools
                     )
-
-                    if response.status_code != 200:
-                        logging.error(
-                            f"OpenRouter API error: {response.status_code} - {response.text}"
-                        )
-                        raise Exception(
-                            f"OpenRouter API error: {response.status_code} - {response.text}"
-                        )
-
-                    result = response.json()
-                    
-                    # Format the response to match the expected format in the Game class
-                    if tools and "choices" in result and len(result["choices"]) > 0:
-                        if "tool_calls" in result["choices"][0]["message"]:
-                            return result["choices"][0]["message"]
-                        else:
-                            return result["choices"][0]["message"]["content"]
+                    print(response)
+                    if tools:
+                        result = response.choices[0].message
                     else:
-                        return result["choices"][0]["message"]["content"]
-                
+                        result = response.choices[0].message.content
+                    # logging.info("\nRESPONSE:", result)
+                    # logging.info("=" * 80)
+                    return result
+                else:
+                    response = await self.client.beta.chat.completions.parse(
+                        messages=formatted_messages,
+                        model=self.model_name,
+                        max_completion_tokens=self.max_tokens,
+                        response_format=output_type,
+                    )
+                    parsed_obj = response.choices[0].message.parsed
+                    result = output_type.model_validate(parsed_obj)
+                    # logging.info("\nRESPONSE:", result)
+                    # logging.info("=" * 80)
+                    return result
+
             except Exception as e:
-                logging.error(f"Error calling OpenRouter API: {str(e)}")
+                logging.info(
+                    f"[DEBUG] Attempt {attempt+1}/{max_retries} failed with exception: {e}"
+                )
+                logging.info("[DEBUG] System prompt (verbatim):")
+                logging.info(system_prompt)
+                logging.info("[DEBUG] User messages (verbatim):")
+                for idx, msg in enumerate(messages):
+                    logging.info(f"  Message {idx+1} - role='{msg['role']}':")
+                    logging.info(msg["content"])
                 last_exception = e
                 await asyncio.sleep(1.0 * (attempt + 1))
 
         raise last_exception
-
-
-    # def _format_messages(
-    #     self, system_prompt: str, user_messages: List[dict]
-    # ) -> List[dict]:
-    #     """
-    #     Utility to prepend a system message.
-    #     user_messages is typically: [{'role': 'user', 'content': ...}, ...]
-    #     """
-    #     return [{"role": "system", "content": system_prompt}] + user_messages
-
-    # async def call(
-    #     self,
-    #     messages: List[dict],
-    #     system_prompt: str = "You are a helpful assistant.",
-    #     output_type: Optional[Type[BaseModel]] = None,
-    #     max_retries: int = 3,
-    #     tools: Optional[Dict[str, Any]] = None,
-    # ) -> Union[str, BaseModel]:
-    #     """
-    #     Calls the LLM using OpenAI's chat completion or HF, returning either raw text
-    #     or a Pydantic-validated object.
-    #     """
-    #     if not self.uses_openai:
-    #         # For HF models, we simply flatten messages into a single string prompt:
-    #         formatted_prompt = f"{system_prompt}\n"
-    #         for m in messages:
-    #             formatted_prompt += f"{m['role'].upper()}:\n{m['content']}\n\n"
-    #         logging.info("\n=== Model Call (HuggingFace) ===")
-    #         logging.info(formatted_prompt)
-    #         logging.info("=" * 80)
-    #         return self.call_hf(formatted_prompt, max_length=self.max_tokens)
-
-    #     # Otherwise, if using an OpenAI-based model:
-    #     formatted_messages = self._format_messages(system_prompt, messages)
-    #     # logging.info("\n=== Model Call (OpenAI) ===")
-    #     # logging.info("System:", system_prompt)
-    #     # for msg in messages:
-    #     #     logging.info(f"{msg['role'].upper()}:", msg['content'])
-    #     # logging.info("=" * 80)
-
-    #     last_exception = None
-    #     for attempt in range(max_retries):
-    #         try:
-    #             if output_type is None:
-    #                 response = await self.client.chat.completions.create(
-    #                     messages=formatted_messages,
-    #                     model=self.model_name,
-    #                     max_completion_tokens=self.max_tokens,
-    #                     tools=tools
-    #                 )
-    #                 print(response)
-    #                 if tools:
-    #                     result = response.choices[0].message
-    #                 else:
-    #                     result = response.choices[0].message.content
-    #                 # logging.info("\nRESPONSE:", result)
-    #                 # logging.info("=" * 80)
-    #                 return result
-    #             else:
-    #                 response = await self.client.beta.chat.completions.parse(
-    #                     messages=formatted_messages,
-    #                     model=self.model_name,
-    #                     max_completion_tokens=self.max_tokens,
-    #                     response_format=output_type,
-    #                 )
-    #                 parsed_obj = response.choices[0].message.parsed
-    #                 result = output_type.model_validate(parsed_obj)
-    #                 # logging.info("\nRESPONSE:", result)
-    #                 # logging.info("=" * 80)
-    #                 return result
-
-    #         except Exception as e:
-    #             logging.info(
-    #                 f"[DEBUG] Attempt {attempt+1}/{max_retries} failed with exception: {e}"
-    #             )
-    #             logging.info("[DEBUG] System prompt (verbatim):")
-    #             logging.info(system_prompt)
-    #             logging.info("[DEBUG] User messages (verbatim):")
-    #             for idx, msg in enumerate(messages):
-    #                 logging.info(f"  Message {idx+1} - role='{msg['role']}':")
-    #                 logging.info(msg["content"])
-    #             last_exception = e
-    #             await asyncio.sleep(1.0 * (attempt + 1))
-
-    #     raise last_exception
 
 
 GAME_PROMPT = ""
@@ -291,14 +193,20 @@ class Game:
         self.added_functions = {}
 
 
-    def play(self, comp_budget: int):
+    async def play(self, comp_budget: int):
         # todo: for now, naive understanding of compute
-        self.compute_budget = comp_budget
+        self.comp_budget = comp_budget
+        # Create a deep copy of the environment by serializing and deserializing its state
+        c_state = type(self.env)()  # Create new instance of same class
+        c_state.__dict__.update(self.env.__dict__.copy())  # Copy all attributes
+        messages = [{
+            "role": "user",
+            "content": f"You are playing a game. Current environment state:\n{str(c_state)}"
+        }]
 
-        c_state = self.env.copy()
         for i in range(self.comp_budget):
 
-            response = self.model.call(messages, GAME_PROMPT, tools=self.tools)
+            response = await self.model.call(messages, GAME_PROMPT, tools=self.tools)
 
             if response.tool_calls:
                 tool_call = response.tool_calls[0]
@@ -365,9 +273,8 @@ class Game:
                 "content": f"You have {self.comp_budget - i} actions left."
             })
 
-if __name__ == "__main__":
+async def main():
     from chess_engine import core
-
     board = core.ChessEngine()
     model_interface = ModelInterface(model_name="o3-mini")
     action_sig = {
@@ -377,6 +284,7 @@ if __name__ == "__main__":
         }
     }
     game = Game(board, model_interface, action_sig)
-    game.play(1)
-    
+    await game.play(1)
 
+if __name__ == "__main__":
+    asyncio.run(main())
