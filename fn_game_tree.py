@@ -112,7 +112,7 @@ class Game:
             current_player = self.env.get_turn()
             print("Turn:", current_player)
             # Set compute budget (could be adapted per player)
-            current_budget = comp_budget if current_player == "white" else 1
+            current_budget = comp_budget if current_player == "black" else 0
             # Use the new recursive parallel search method
             decision = await self.play_with_state(self.env.copy(), [], current_budget)
             # Apply the final chosen move on the actual environment.
@@ -129,7 +129,7 @@ class Game:
                 break
         return self.env.get_result()
 
-    async def play_with_state(self, state, history: List[dict], budget: int, root_move: Optional[Move] = None) -> Move:
+    async def play_with_state(self, state, history: List[dict], budget: int, root_move: Optional[Move] = None, start=False) -> Move:
         """
         Recursive, parallel tree search from a given state with the remaining compute budget.
         Anchors each branch to the candidate move taken at the starting state.
@@ -176,7 +176,7 @@ class Game:
         # Launch simulations in parallel for each candidate option.
         tasks = [simulate_option(option) for option in options]
         simulated_results = await asyncio.gather(*tasks)
-        print(simulated_results)
+        simulated_results = [x for x in simulated_results if x[0].desc != "Invalid move"]
     
         # Synthesize evaluations: force the synthesis to pick among the anchored moves.
         synthesis_input = "Based on the following simulated branches from the original board state, decide which candidate move is best. " \
@@ -195,7 +195,7 @@ class Game:
         final_decision = await self.model.call(
             messages,
             system_prompt=f"Synthesize branch results into one move decision in the chess game in UCI format. " \
-                          f"Only consider the anchored candidate moves from the starting state. You are {state.get_turn()}",
+                          f"Only consider the anchored candidate moves from the starting state. You are {self.env.get_turn()}",
             output_type=Move
         )
         print(final_decision)
@@ -214,6 +214,7 @@ class Game:
                 f"History: {history}\n"
                 "Provide a terminal evaluation and recommend a final move (in UCI format, e.g., f3e5) with a brief explanation. "
                 "ONLY consider the move proposed at the starting state of this branch. No Nb stuff."
+                f"You are {state.get_turn()}"
             )
         }]
         evaluation = await self.model.call(
