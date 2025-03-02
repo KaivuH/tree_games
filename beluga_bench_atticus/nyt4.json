@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["STAFF", "CIGAR", "AMAZE", "LEVEE", "PRESS"],
+      "down": ["SCALP", "TIMER", "AGAVE", "FARLS", "FREES"]
+    },
+    "clues": {
+      "across": [
+        "1. Magic accessory for Gandalf the Grey",
+        "6. Item often cut with a pocket-sized guillotine cutter",
+        "7. Fill with awe",
+        "8. Flood stopper",
+        "9. Word repeated in \"Any ___ is good ___\""
+      ],
+      "down": [
+        "1. Top of the head",
+        "2. Track meet official",
+        "3. Plant used to make tequila",
+        "4. Flusters",
+        "5. Saves from jail in Capture the Flag, say"
+      ]
+    },
+    "grid": [
+      "S", "T", "A", "F", "F",
+      "C", "I", "G", "A", "R",
+      "A", "M", "A", "Z", "E",
+      "L", "E", "V", "E", "E",
+      "P", "R", "E", "S", "S"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 3",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

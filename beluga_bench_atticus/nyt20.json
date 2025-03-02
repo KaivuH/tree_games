@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["CROCI", "AURAS", "CLASH", "TETE", "IRE"],
+      "down": ["CACTI", "RULE", "ORATE", "CASE", "ISH"]
+    },
+    "clues": {
+      "across": [
+        "1. Flowers that bloom in late winter",
+        "6. Energy fields \"read\" by psychics",
+        "7. Conflict jarringly, as colors",
+        "8. Head, in French",
+        "9. Wrathful feeling"
+      ],
+      "down": [
+        "1. Prickly pears, e.g.",
+        "2. What'll give you an inch, but not a mile",
+        "3. Make a speech",
+        "4. Detective's assignment",
+        "5. \"Kinda sorta\""
+      ]
+    },
+    "grid": [
+      "C", "R", "O", "C", "I",
+      "A", "U", "R", "A", "S",
+      "C", "L", "A", "S", "H",
+      "T", "E", "T", "E", "*",
+      "I", "R", "E", "*", "*"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "5x5 Crossword",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

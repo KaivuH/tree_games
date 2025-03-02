@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["TALC", "ATEAM", "MAGMA", "PLIES", "ALTOS"],
+      "down": ["TAMPA", "ALOOF", "LITES", "CAMAS", "MASS"]
+    },
+    "clues": {
+      "across": [
+        "1. Soft rock",
+        "5. First-string squad",
+        "7. Soft rock?",
+        "8. Tissue layers, e.g.",
+        "9. Fiona Apple and Tracy Chapman, vocally"
+      ],
+      "down": [
+        "1. Florida's so-called \"Cigar City\"",
+        "2. To any degree",
+        "3. Not sketchy, colloquially",
+        "4. Brief role in a movie",
+        "6. Midnight ___ (Christmas service)"
+      ]
+    },
+    "grid": [
+      "T", "A", "L", "C", " ",
+      "A", "T", "E", "A", "M",
+      "M", "A", "G", "M", "A",
+      "P", "L", "I", "E", "S",
+      "A", "L", "T", "O", "S"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 6,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 1",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

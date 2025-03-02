@@ -1,0 +1,59 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "AHA",
+        "MEMOS",
+        "UHOHS",
+        "MINUS",
+        "MGM"
+      ],
+      "down": [
+        "WE",
+        "AMONG",
+        "SOSO",
+        "MUM",
+        "SIZZLE"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. \"Good one!\"",
+        "4. Messages to the office staff",
+        "6. Exclamations accompanied by nervous gulps",
+        "7. Calculator key",
+        "8. ___ Grand (Vegas casino)"
+      ],
+      "down": [
+        "1. Pronoun pair",
+        "2. In the midst of",
+        "3. So-so",
+        "4. Not saying a word",
+        "5. Sound of a sizzling steak"
+      ]
+    },
+    "grid": [
+      "*", "H", "A", "H", "*",
+      "M", "E", "M", "O", "S",
+      "U", "H", "O", "H", "S",
+      "M", "I", "N", "U", "S",
+      "*", "M", "G", "M", "*"
+    ],
+    "gridnums": [
+      0, 1, 0, 3, 0,
+      4, 0, 0, 0, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      0, 8, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Mini Crossword",
+    "author": "Unknown",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Unknown"
+  }

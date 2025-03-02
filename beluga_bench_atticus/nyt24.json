@@ -1,0 +1,59 @@
+{
+  "acrossmap": null,
+  "admin": false,
+  "answers": {
+    "across": [
+      "MONTH",
+      "ANORA",
+      "TIMER",
+      "TOAST",
+      "ENDS"
+    ],
+    "down": [
+      "MONTH",
+      "ONTIE",
+      "NOMAD",
+      "TRESS",
+      "HART"
+    ]
+  },
+  "clues": {
+    "across": [
+      "1. What each knuckle represents in a famous mnemonic device",
+      "6. Best Picture nominee starring Mikey Madison",
+      "7. Something set on a microwave",
+      "8. \"Here's to love!,\" e.g.",
+      "9. Burnt ___ (barbecue tidbits)"
+    ],
+    "down": [
+      "1. Not glossy, as a photo",
+      "2. Publication with the headline \"History Sighs, Repeats Itself,\" with \"The\"",
+      "3. Wanderer",
+      "4. Lock of hair",
+      "5. Comedian Kevin (with a name that's fitting for Valentine's Day)"
+    ]
+  },
+  "grid": [
+    "M", "O", "N", "T", "H",
+    "A", "N", "O", "R", "A",
+    "T", "I", "M", "E", "R",
+    "T", "O", "A", "S", "T",
+    "E", "N", "D", "S", "*"
+  ],
+  "gridnums": [
+    1, 2, 3, 4, 5,
+    6, 0, 0, 0, 0,
+    7, 0, 0, 0, 0,
+    8, 0, 0, 0, 0,
+    9, 0, 0, 0, 0
+  ],
+  "size": {
+    "cols": 5,
+    "rows": 5
+  },
+  "title": "Knuckle Mnemonic Crossword",
+  "author": "Claude",
+  "date": "2025/03/01",
+  "dow": "Saturday",
+  "publisher": "Claude Crosswords"
+}

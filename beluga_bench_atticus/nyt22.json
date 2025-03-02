@@ -1,0 +1,71 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "HEAD",
+        "TANGO",
+        "CHARGER",
+        "HOTPINK",
+        "INTENTS",
+        "MOORE",
+        "PROS"
+      ],
+      "down": [
+        "HARPER",
+        "EARRING",
+        "AGENT",
+        "DORKS",
+        "ICON",
+        "CHOPS",
+        "THOMSON"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. Beer foam",
+        "5. Dance that it takes \"two\" to do",
+        "6. Annoying thing to forget on a trip",
+        "8. Color associated with Barbie",
+        "9. \"For all ___ and purposes ...\"",
+        "10. Maryland governor Wes",
+        "11. Cons' counterparts"
+      ],
+      "down": [
+        "1. Oldest monthly magazine in the U.S., launched in 1850",
+        "2. Front car of a train",
+        "3. Athlete's representative",
+        "4. Nerds",
+        "5. Body image?",
+        "6. Bonobo relative",
+        "7. Pay tribute to"
+      ]
+    },
+    "grid": [
+      "H", "E", "A", "D", "*", "*", "*",
+      "T", "A", "N", "G", "O", "*", "*",
+      "C", "H", "A", "R", "G", "E", "R",
+      "H", "O", "T", "P", "I", "N", "K",
+      "I", "N", "T", "E", "N", "T", "S",
+      "M", "O", "O", "R", "E", "*", "*",
+      "P", "R", "O", "S", "*", "*", "*"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0, 0, 0,
+      5, 0, 0, 0, 0, 0, 0,
+      6, 0, 0, 0, 0, 0, 0,
+      8, 0, 0, 0, 0, 0, 0,
+      9, 0, 0, 0, 0, 0, 0,
+      10, 0, 0, 0, 0, 0, 0,
+      11, 0, 0, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 7,
+      "rows": 7
+    },
+    "title": "7x7 Crossword",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

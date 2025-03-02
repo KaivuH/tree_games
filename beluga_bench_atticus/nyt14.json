@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["DATE", "MEDIA", "ATOMS", "DOPEY", "EXTRA"],
+      "down": ["MADE", "DETOX", "ADOPT", "TIMER", "EASYA"]
+    },
+    "clues": {
+      "across": [
+        "1. Square on a wall calendar, or a fun thing you might put on the calendar",
+        "5. Social ___",
+        "6. Tiny things studied by chemists",
+        "7. Only one of the Seven Dwarfs without a beard",
+        "8. Over the top, in slang"
+      ],
+      "down": [
+        "1. Period of abstaining from unhealthy substances",
+        "2. Take in as one's own",
+        "3. Function in a Clock app",
+        "4. Class you might take to boost your G.P.A.",
+        "5. Like a bed with the covers tucked neatly in place"
+      ]
+    },
+    "grid": [
+      " ", "D", "A", "T", "E",
+      "M", "E", "D", "I", "A",
+      "A", "T", "O", "M", "S",
+      "D", "O", "P", "E", "Y",
+      "E", "X", "T", "R", "A"
+    ],
+    "gridnums": [
+      0, 1, 2, 3, 4,
+      5, 0, 0, 0, 0,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 15",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

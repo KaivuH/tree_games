@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["SHORT", "WOMAN", "ELECT", "EDGY", "TSA"],
+      "down": ["SWEET", "HOLDS", "OMEGA", "RACY", "TNT"]
+    },
+    "clues": {
+      "across": [
+        "1. \"Vertically challenged\"",
+        "6. \"I am ___, hear me roar!\"",
+        "7. Vote into office",
+        "8. Like a bold haircut or piercing",
+        "9. Org. that might make you take your laptop out of your suitcase"
+      ],
+      "down": [
+        "1. Partner of 1-Across",
+        "2. Half nelson and cobra clutch, in wrestling",
+        "3. Lowest-ranking member of the wolfpack",
+        "4. Risqué",
+        "5. Explosive that was originally used as a yellow dye"
+      ]
+    },
+    "grid": [
+      "S", "H", "O", "R", "T",
+      "W", "O", "M", "A", "N",
+      "E", "L", "E", "C", "T",
+      "E", "D", "G", "Y", " ",
+      "T", "S", "A", " ", " "
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 17",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

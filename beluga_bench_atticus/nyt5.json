@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["KATIE", "ALERT", "LINES", "EBONY", "IRE"],
+      "down": ["KALE", "ALIBI", "TENOR", "IRENE", "ETSY"]
+    },
+    "clues": {
+      "across": [
+        "1. Gold medalist Ledecky",
+        "6. Cellphone pop-up",
+        "7. What gamblers and actors study",
+        "8. Wood traditionally used for black piano keys",
+        "9. Anger"
+      ],
+      "down": [
+        "1. Salad green derived from wild mustard",
+        "2. Cover story told in court",
+        "3. Choir member",
+        "4. ___ Adler, character who outsmarted Sherlock Holmes",
+        "5. Site that dubs itself \"the global marketplace for unique and creative goods\""
+      ]
+    },
+    "grid": [
+      "K", "A", "T", "I", "E",
+      "A", "L", "E", "R", "T",
+      "L", "I", "N", "E", "S",
+      "E", "B", "O", "N", "Y",
+      " ", "I", "R", "E", " "
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      0, 9, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 4",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

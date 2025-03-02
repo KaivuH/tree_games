@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["BAGEL", "AROSE", "LOOSE", "EASE", "REX"],
+      "down": ["BALE", "AROAR", "GOOSE", "ESSEX", "LEE"]
+    },
+    "clues": {
+      "across": [
+        "1. Food that many an N.Y.C. tourist grabs for breakfast",
+        "6. Got out of bed",
+        "7. Adjective paired with 3-Down in a simile",
+        "8. Effortlessness",
+        "9. Tyrannosaurus___"
+      ],
+      "down": [
+        "1. Makeshift seat in a barnyard, maybe",
+        "2. Very loud, like a stadium crowd",
+        "3. Bird whose name rhymes with 7-Across",
+        "4. Fictional Vermont college on HBO Max's \"The Sex Lives of College Girls\"",
+        "5. Author Harper"
+      ]
+    },
+    "grid": [
+      "B", "A", "G", "E", "L",
+      "A", "R", "O", "S", "E",
+      "L", "O", "O", "S", "E",
+      "E", "A", "S", "E", " ",
+      " ", "R", "E", "X", " "
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      0, 9, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 16",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

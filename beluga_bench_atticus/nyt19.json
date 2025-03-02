@@ -1,0 +1,60 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "BAM",
+        "OHBABY",
+        "DOUBLE",
+        "DECKER",
+        "ADS"
+      ],
+      "down": [
+        "BODDA",
+        "AHOUED",
+        "MBCKS",
+        "***ALE",
+        "***YER"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. Sound of hard impact",
+        "4. \"Hoo-wee!\"",
+        "7. With 8-Across, kind of bus associated with London",
+        "8. See 7-Across",
+        "9. Sponsored posts in one's newsfeed, e.g."
+      ],
+      "down": [
+        "1. Dessert described as \"half-bread, half-cake\"",
+        "2. Having a full range of physical or mental abilities",
+        "3. Mike who played Austin Powers",
+        "4. Quirky",
+        "5. Garden tool used for weeding",
+        "6. Tampa Bay football player, for short"
+      ]
+    },
+    "grid": [
+      "*", "B", "A", "M", "*", "*",
+      "O", "H", "B", "A", "B", "Y",
+      "D", "O", "U", "B", "L", "E",
+      "D", "E", "C", "K", "E", "R",
+      "*", "*", "*", "A", "D", "S"
+    ],
+    "gridnums": [
+      0, 1, 2, 3, 0, 0,
+      4, 0, 0, 0, 0, 0,
+      7, 0, 0, 0, 0, 0,
+      8, 0, 0, 0, 0, 0,
+      0, 0, 0, 9, 0, 0
+    ],
+    "size": {
+      "cols": 6,
+      "rows": 5
+    },
+    "title": "BAM! Crossword",
+    "author": "Crossword Puzzle",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Crossword Puzzles"
+  }

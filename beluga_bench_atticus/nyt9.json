@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["GLASS", "NORTH", "ACTOR", "WHINE", "SEEK"],
+      "down": ["GNAW", "LOCHS", "ARTIE", "STONE", "SHREK"]
+    },
+    "clues": {
+      "across": [
+        "1. Material made by melting sand",
+        "6. It's to your left when facing the sunrise",
+        "7. One in a cast",
+        "8. Say \"This isn't fair!,\" say",
+        "9. Look for"
+      ],
+      "down": [
+        "1. Chew like a beaver",
+        "2. Scottish bodies of water",
+        "3. \"The Sopranos\" restaurateur",
+        "4. Object slid across a curling rink",
+        "5. He tells Donkey \"Ogres are like onions\""
+      ]
+    },
+    "grid": [
+      "G", "L", "A", "S", "S",
+      "N", "O", "R", "T", "H",
+      "A", "C", "T", "O", "R",
+      "W", "H", "I", "N", "E",
+      " ", "S", "E", "E", "K"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      0, 9, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 9",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

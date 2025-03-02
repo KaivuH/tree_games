@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["VAN", "AVERT", "TOWER", "ISEE", "DYKE"],
+      "down": ["VAT", "AVOID", "NEWSY", "REEK", "TREE"]
+    },
+    "clues": {
+      "across": [
+        "1. With 9-Across, Dick who starred in a Coldplay music video released on his 99th birthday in December 2024",
+        "4. Turn away, as one's gaze",
+        "7. Seattle's Space Needle, for one",
+        "8. \"Ah, gotcha\"",
+        "9. See 1-Across"
+      ],
+      "down": [
+        "1. Tank in a factory",
+        "2. Steer clear of",
+        "3. Filled with the latest gossip",
+        "5. Smell *terrible*",
+        "6. Stereotypically simple role in a school play"
+      ]
+    },
+    "grid": [
+      "V", "A", "N", " ", " ",
+      "A", "V", "E", "R", "T",
+      "T", "O", "W", "E", "R",
+      " ", "I", "S", "E", "E",
+      " ", "D", "Y", "K", "E"
+    ],
+    "gridnums": [
+      1, 2, 3, 0, 0,
+      4, 0, 0, 5, 6,
+      7, 0, 0, 0, 0,
+      0, 8, 0, 0, 0,
+      0, 9, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 12",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

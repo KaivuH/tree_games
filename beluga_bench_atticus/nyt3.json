@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["LED", "ERODE", "MAGIC", "TRICK", "SECTS"],
+      "down": ["LEMTS", "EMRRCS", "DAIIC", "GGCKT", "ECKSS"]
+    },
+    "clues": {
+      "across": [
+        "1. Type of bulb in many Christmas lights, for short",
+        "4. Diminish, as confidence",
+        "6. With 7-Across, sawing a person in half, e.g.",
+        "7. See 6-Across",
+        "8. Breakaway religious groups"
+      ],
+      "down": [
+        "1. Sudoku solver's asset",
+        "2. Official decree",
+        "3. Illusionists might cut them in half",
+        "4. CPR pros",
+        "5. Like finding a four-leaf clover"
+      ]
+    },
+    "grid": [
+      " ", " ", "L", "E", "D",
+      "E", "R", "O", "D", "E",
+      "M", "A", "G", "I", "C",
+      "T", "R", "I", "C", "K",
+      "S", "E", "C", "T", "S"
+    ],
+    "gridnums": [
+      0, 0, 1, 2, 3,
+      4, 5, 0, 0, 0,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 2",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

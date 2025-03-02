@@ -1,0 +1,65 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "MIND",
+        "AMOUR",
+        "RHINO",
+        "CISCO",
+        "STEP"
+      ],
+      "down": [
+        "MARC",
+        "INK",
+        "NOIR",
+        "DSC",
+        "AMOUR",
+        "UNC",
+        "RHIO",
+        "STP"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. \"___ the gap!\" (advice for solving this puzzle)",
+        "5. Love, in French",
+        "7. African mammal with armorlike skin",
+        "8. Major tech company founded in San Fran, as its name suggests",
+        "9. \"Watch your ___!\" (advice for solving this puzzle)"
+      ],
+      "down": [
+        "1. Painter Chagall and podcaster Maron",
+        "2. Dramatic cry during a paintball game",
+        "3. Distraction while working at the library, maybe",
+        "4. Sag",
+        "5. Love, in French",
+        "6. Tar Heels' school, for short",
+        "7. African mammal with armorlike skin",
+        "9. \"Watch your ___!\" (advice for solving this puzzle)"
+      ]
+    },
+    "grid": [
+      "M", "I", "N", "*", "D",
+      "A", "M", "O", "U", "R",
+      "R", "H", "I", "N", "O",
+      "C", "I", "S", "C", "O",
+      "S", "T", "E", "*", "P"
+    ],
+    "gridnums": [
+      1, 2, 3, 0, 4,
+      5, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "MIND THE GAP Crossword",
+    "author": "Unknown",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Unknown"
+  }

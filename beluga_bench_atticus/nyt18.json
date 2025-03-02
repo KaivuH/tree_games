@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["CATS", "ALOHA", "BOTOX", "SNARL", "GLEE"],
+      "down": ["CABS", "ALONG", "TOTAL", "SHORE", "AXLE"]
+    },
+    "clues": {
+      "across": [
+        "1. 2019 flop whose Variety review began \"Nine may not be enough lives for some of the stars to live down their involvement in this ...\"",
+        "5. Hawaiian greeting",
+        "7. Wrinkle-removing treatment",
+        "8. Entanglement",
+        "9. Pure joy"
+      ],
+      "down": [
+        "1. They're hard to hail in the rain",
+        "2. \"___ came a spider / Who sat down beside her...\"",
+        "3. Sum",
+        "4. Place for beachcombing",
+        "6. Rod with wheels"
+      ]
+    },
+    "grid": [
+      "C", "A", "T", "S", " ",
+      "A", "L", "O", "H", "A",
+      "B", "O", "T", "O", "X",
+      "S", "N", "A", "R", "L",
+      " ", "G", "L", "E", "E"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 6,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      0, 9, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 19",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

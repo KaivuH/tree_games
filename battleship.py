@@ -324,19 +324,19 @@ class BattleshipGame:
                             messages[attacker] += new_message
                     else:
                         messages[attacker] += new_message
-                    print("length of messages:", len(messages[attacker]))
-                    print("full message history:", messages[attacker])
+                    # print("length of messages:", len(messages[attacker]))
+                    # print("full message history:", messages[attacker])
                     print("number of tools available:", len(self.tools[attacker]))
 
                     if attacker == 0:
                         response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=1024, max_tokens=2000)
                     else:
-                        response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=4096, max_tokens=5000)
+                        response = await call_claude(system, messages[attacker], tools=self.tools[attacker], think_budget=2048, max_tokens=3000)
                     print(response)
 
                     if isinstance(response[-1], ToolUseBlock):
                         tool_call = response[-1]
-                        # print(tool_call)
+                        print(tool_call[0])
                         arguments = tool_call.input
                         if tool_call.name == "propose_new_tool":
                             for i in range(1, 4):

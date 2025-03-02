@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["BAKER", "OLIVE", "TOWEL", "CHINA", "HASTY"],
+      "down": ["BOTCH", "ALOHA", "KIWIS", "EVENT", "RELAY"]
+    },
+    "clues": {
+      "across": [
+        "1. Owner of a shop called The Bun Also Rises, most likely",
+        "6. Kind of oil served with bread",
+        "7. Throw in the ___",
+        "8. \"Fine\" dishware for a dinner party",
+        "9. Very quick"
+      ],
+      "down": [
+        "1. Bungle, as plastic surgery",
+        "2. ___ State, nickname for Hawaii",
+        "3. Fuzzy fruits or flightless birds",
+        "4. 4 x 400-meter race, e.g.",
+        "5. 4 x 400-meter race, e.g."
+      ]
+    },
+    "grid": [
+      "B", "A", "K", "E", "R",
+      "O", "L", "I", "V", "E",
+      "T", "O", "W", "E", "L",
+      "C", "H", "I", "N", "A",
+      "H", "A", "S", "T", "Y"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 14",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

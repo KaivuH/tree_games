@@ -1,0 +1,59 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "CAT",
+        "CHIEF",
+        "LAMAR",
+        "ENEMY",
+        "TDS"
+      ],
+      "down": [
+        "EAGLE",
+        "AT",
+        "PLAYS",
+        "BROWNS",
+        "FRY"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. Bengal or lion",
+        "4. Patrick Mahomes, for his entire N.F.L. career",
+        "6. Kendrick ___, Super Bowl LIX halftime act",
+        "7. Opposing side",
+        "8. Super Bowl scores, for short"
+      ],
+      "down": [
+        "1. \"E-A-G-L-E-S, Eagles!,\" for one",
+        "2. Targeted, as a football throw",
+        "3. Play groups?",
+        "4. The Browns, on N.F.L. scoreboards",
+        "5. Cook in the pan"
+      ]
+    },
+    "grid": [
+       "*","C", "A", "T", "*",
+      "C", "H", "I", "E", "F",
+      "L", "A", "M", "A", "R",
+      "E", "N", "E", "M", "Y",
+      "*", "T", "D", "S", "*"
+    ],
+    "gridnums": [
+      1, 2, 3, 0, 0,
+      4, 0, 0, 0, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      0, 8, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "NFL Themed Crossword",
+    "author": "Unknown",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Unknown"
+  }

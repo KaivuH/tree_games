@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["PISA", "CORAL", "OLIVE", "ROSE", "ASH"],
+      "down": ["PCORA", "IOLSH", "SLIVE", "AALE", "*"]
+    },
+    "clues": {
+      "across": [
+        "1. Italian tourist city you might be \"inclined\" to visit",
+        "5. Pink/orange shade",
+        "6. Green/yellow shade",
+        "7. Red/pink shade",
+        "8. Silver/gray shade"
+      ],
+      "down": [
+        "1. Many collared golf shirts",
+        "2. From Dublin or Derry",
+        "3. Command+S, on a Mac",
+        "4. Pint at a public house",
+        "5. ___ Crawley, \"Downton Abbey\" countess"
+      ]
+    },
+    "grid": [
+      "*", "P", "I", "S", "A",
+      "C", "O", "R", "A", "L",
+      "O", "L", "I", "V", "E",
+      "R", "O", "S", "E", "*",
+      "A", "S", "H", "*", "*"
+    ],
+    "gridnums": [
+      0, 1, 0, 0, 0,
+      5, 0, 0, 0, 0,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Color Shades Crossword",
+    "author": "Unknown",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Unknown"
+  }

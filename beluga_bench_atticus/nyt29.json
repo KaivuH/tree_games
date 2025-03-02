@@ -1,0 +1,58 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "BRAT",
+        "RAGE",
+        "GIVEN",
+        "EDEN",
+        "TENT"
+      ],
+      "down": [
+        "BRGET",
+        "RADEN",
+        "AGENT",
+        "TENT"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. 2024 Charli XCX album with a lime green cover",
+        "5. All the ___ (super popular)",
+        "6. Like presents and first names",
+        "7. Where fig leaves first came into fashion",
+        "8. Rain-friendly rental for an outdoor wedding"
+      ],
+      "down": [
+        "1. Someone walking in front of a train?",
+        "2. Bird in a Poe poem",
+        "3. Worker at an airport gate",
+        "4. Tweenager's age, maybe",
+        "6. Understand"
+      ]
+    },
+    "grid": [
+      "*", "B", "R", "A", "T",
+      "R", "A", "G", "E", "*",
+      "G", "I", "V", "E", "N",
+      "E", "D", "E", "N", "*",
+      "T", "E", "N", "T", "*"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 0,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "BRAT Crossword",
+    "author": "Charli XCX Fan",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Pop Culture Puzzles"
+  }

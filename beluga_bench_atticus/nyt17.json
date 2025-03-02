@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["MEME", "EVADE", "SONIA", "SKITS", "YEAST"],
+      "down": ["MESSY", "EVOKE", "MAINE", "EDITS", "EAST"]
+    },
+    "clues": {
+      "across": [
+        "1. Raygun or Moo Deng, in 2024",
+        "5. Avoid, as one's taxes",
+        "7. Sotomayor of the Supreme Court",
+        "8. Comical routines in a school talent show",
+        "9. \"I only eat unleavened bread now; I'm on the path of ___ resistance!\" (groaner)"
+      ],
+      "down": [
+        "1. Like a roommate who leaves dishes in the sink and socks on the sofa",
+        "2. Bring to mind",
+        "3. Ending with ego, pyro- or klepto-",
+        "4. Polishes, as an article",
+        "6. \"___ of Eden\" (Steinbeck novel)"
+      ]
+    },
+    "grid": [
+      "M", "E", "M", "E", " ",
+      "E", "V", "A", "D", "E",
+      "S", "O", "N", "I", "A",
+      "S", "K", "I", "T", "S",
+      "Y", "E", "A", "S", "T"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 6,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 18",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

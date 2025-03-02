@@ -1,0 +1,71 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "FIFA",
+        "MUSIC", 
+        "GENTLE", 
+        "SELFIES", 
+        "INLAND", 
+        "CROCK", 
+        "KENT"
+      ],
+      "down": [
+        "COOL", 
+        "ADMISSION", 
+        "SMOOTHED", 
+        "AAAA", 
+        "PITTSBURGH", 
+        "ROMCOM", 
+        "TOTALLY"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. Governing body of world soccer",
+        "5. \"___ is a world within itself, with a language we all understand\" (Stevie Wonder lyric)",
+        "6. Opposite of rough",
+        "7. Pictures that employ the \"flip camera\" button",
+        "8. Away from the ocean",
+        "9. Earthenware pot",
+        "10. Clark ___ a.k.a. Superman"
+      ],
+      "down": [
+        "1. Cool bit of trivia",
+        "2. Admission of ineptitude",
+        "3. Smoothed, as fingernails",
+        "4. AAAA, in a deck",
+        "5. Pittsburgh's Carnegie ___ University",
+        "6. Rom-com or thriller",
+        "7. \"Totally awesome!\""
+      ]
+    },
+    "grid": [
+      "*", "*", "*", "F", "I", "F", "A",
+      "*", "*", "M", "U", "S", "I", "C",
+      "*", "G", "E", "N", "T", "L", "E",
+      "S", "E", "L", "F", "I", "E", "S",
+      "I", "N", "L", "A", "N", "D", "*",
+      "C", "R", "O", "C", "K", "*", "*",
+      "K", "E", "N", "T", "*", "*", "*"
+    ],
+    "gridnums": [
+      0, 0, 0, 1, 2, 3, 4,
+      0, 0, 5, 0, 0, 0, 0,
+      0, 6, 0, 0, 0, 0, 0,
+      7, 0, 0, 0, 0, 0, 0,
+      8, 0, 0, 0, 0, 0, 0,
+      9, 0, 0, 0, 0, 0, 0,
+      10, 0, 0, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 7,
+      "rows": 7
+    },
+    "title": "Daily Crossword",
+    "author": "Unknown",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Unknown Publisher"
+  }

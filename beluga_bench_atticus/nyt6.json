@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["BASS", "ALIAS", "GARBO", "EMERY", "LONE"],
+      "down": ["BAGEL", "ALAMO", "SIREN", "SABRE", "SOY"]
+    },
+    "clues": {
+      "across": [
+        "1. Instrument in a band's rhythm section",
+        "5. The name Jane Doe, e.g.",
+        "7. Legendary actress Greta",
+        "8. Manicurist's board",
+        "9. Singular"
+      ],
+      "down": [
+        "1. The \"bun\" for a breakfast sandwich, often",
+        "2. Texas landmark at which Pee-Wee Herman asks \"Where's the basement?... Aren't we gonna see the basement?\"",
+        "3. Sound from an ambulance",
+        "4. Certain sword spelled the British way",
+        "6. Base of miso"
+      ]
+    },
+    "grid": [
+      "B", "A", "S", "S", " ",
+      "A", "L", "I", "A", "S",
+      "G", "A", "R", "B", "O",
+      "E", "M", "E", "R", "Y",
+      "L", "O", "N", "E", " "
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 6,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 5",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

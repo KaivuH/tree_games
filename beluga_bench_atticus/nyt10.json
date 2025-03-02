@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["DAMP", "ALOOF", "TIGER", "ACUTE", "ELSE"],
+      "down": ["DATA", "ALICE", "MOGUL", "POETS", "FREE"]
+    },
+    "clues": {
+      "across": [
+        "1. Kinda wet",
+        "5. Standoffish",
+        "7. Creature on a lifeboat with Pi, in \"Life of Pi\"",
+        "8. Less than 90°",
+        "9. \"What ___ is new?\""
+      ],
+      "down": [
+        "1. What hasn't been processed if it's raw",
+        "2. Character who climbs through the looking glass",
+        "3. Tycoon",
+        "4. Ones working with meters and feet?",
+        "6. Complimentary"
+      ]
+    },
+    "grid": [
+      "D", "A", "M", "P", " ",
+      "A", "L", "O", "O", "F",
+      "T", "I", "G", "E", "R",
+      "A", "C", "U", "T", "E",
+      " ", "E", "L", "S", "E"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 6,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      0, 9, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 10",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

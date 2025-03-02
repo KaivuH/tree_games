@@ -36,7 +36,8 @@ class CrosswordEnv:
                     return False
                 grid_list[row][col + i] = letter
         elif direction == "down":
-            if row + len(word) > len(grid_list):
+            # Check that starting col is valid.
+            if col >= len(grid_list[0]) or row + len(word) > len(grid_list):
                 return False
             for i, letter in enumerate(word):
                 if grid_list[row + i][col] == "#":

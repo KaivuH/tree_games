@@ -1,0 +1,60 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": [
+        "CRISP",
+        "LANCE",
+        "OSCAR",
+        "STUNT",
+        "EARTH"
+      ],
+      "down": [
+        "CLOSE",
+        "RASTA",
+        "INCUR",
+        "SCANT",
+        "PERTH"
+      ]
+    },
+    "clues": {
+      "across": [
+        "1. Like a dry-cleaned shirt or fresh sheets",
+        "6. Weapon used on horseback",
+        "7. One of a potential 13 for \"Emilia Pérez,\" as announced last week",
+        "8. Movie double's responsibility",
+        "9. The \"blue marble\""
+      ],
+      "down": [
+        "1. In the ballpark",
+        "2. Someone who might smoke ganja as a sacrament, informally",
+        "3. Run up, as debt",
+        "4. Meager",
+        "5. Capital of Western Australia"
+      ]
+    },
+    "grid": [
+      "C", "R", "I", "S", "P",
+      "L", "A", "N", "C", "E",
+      "O", "S", "C", "A", "R",
+      "S", "T", "U", "N", "T",
+      "E", "A", "R", "T", "H"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "5x5 Crossword",
+    "author": "ChatGPT",
+    "date": "2025/03/01",
+    "dow": "Monday",
+    "publisher": "ChatGPT Crosswords"
+  }
+  

@@ -1,0 +1,184 @@
+Current grid:
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=2, col=1, direction='across', word='mocha', desc='Answer for 6.Across – Chocolate-flavored coffee drink'), CrosswordMove(row=4, col=1, direction='across', word='skort', desc="Answer for 8.Across – Hybrid women's golfing attire")]
+Final decision: row=2 col=1 direction='across' word='mocha' desc="Both candidate moves were flagged as invalid by simulation, but 'mocha' — a common answer for a chocolate-flavored coffee drink — is preferred over 'skort,' which is less likely to yield useful grid intersections. Thus, we choose 'mocha' despite the simulation shortcomings."
+Decision: row=2 col=1 direction='across' word='mocha' desc="Both candidate moves were flagged as invalid by simulation, but 'mocha' — a common answer for a chocolate-flavored coffee drink — is preferred over 'skort,' which is less likely to yield useful grid intersections. Thus, we choose 'mocha' despite the simulation shortcomings."
+Final move was invalid. Retrying...
+Current grid:
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fills 1-Across 'Give me some ___' with SPACE, aligning intersections to form SMASH, POLKA, ACTOR, CHARS, and EARTH down."), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Fills 9-Across 'Overly tough' with HARSH, matching intersections (H from SMASH, A from POLKA, R from ACTOR, S from CHARS, H from EARTH).")]
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fills 6-Across 'Chocolate-flavored coffee drink' with MOCHA, matching intersections for down words."), CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-Across 'Ending point for a walk down the aisle' with ALTAR, aligning with intersecting down clues.")]
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fills 6-Across 'Chocolate-flavored coffee drink' with MOCHA."), CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-Across 'Ending point for a walk down the aisle' with ALTAR.")]
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc='Fills 6-Across with MOCHA, a five-letter chocolate-flavored coffee drink.'), CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc='Fills 8-Across with SKORT, the hybrid golfing attire combining a skirt and shorts.')]
+Candidate options: [CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-Across 'Ending point for a walk down the aisle' with ALTAR, intersecting down words SMASH, POLKA, ACTOR, CHARS, and EARTH."), CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills 8-Across 'Hybrid women's golfing attire' with SKORT, aligning with the intersecting down letters.")]
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fills 1-Across 'Give me some ___' with SPACE. Intersections yield S (from SMASH Down1), P (from POLKA Down2), A (from ACTOR Down3), C (from CHARS Down4), and E (from EARTH Down5)."), CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fills 6-Across 'Chocolate-flavored coffee drink' with MOCHA, a five-letter word that fits the grid and intersections.")]
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fills 1-Across 'Give me some ___' with SPACE, matching intersections (S from SMASH, P from POLKA, A from ACTOR, C from CHARS, E from EARTH)."), CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-Across 'Ending point for a walk down the aisle' with ALTAR, matching intersections (A from SMASH, L from POLKA, T from ACTOR, A from CHARS, R from EARTH).")]
+Final decision: row=0 col=0 direction='across' word='SPACE' desc="Chosen because filling 1-Across with 'SPACE' sets up correct intersections (yielding SMASH, POLKA, ACTOR, CHARS, and EARTH down) and opens several strong follow-up possibilities (e.g., SKORT, ALTAR, MOCHA), making it the most flexible and anchored move."
+Decision: row=0 col=0 direction='across' word='SPACE' desc="Chosen because filling 1-Across with 'SPACE' sets up correct intersections (yielding SMASH, POLKA, ACTOR, CHARS, and EARTH down) and opens several strong follow-up possibilities (e.g., SKORT, ALTAR, MOCHA), making it the most flexible and anchored move."
+Final action taken: {'row': 0, 'col': 0, 'direction': 'across', 'word': 'SPACE', 'desc': "Chosen because filling 1-Across with 'SPACE' sets up correct intersections (yielding SMASH, POLKA, ACTOR, CHARS, and EARTH down) and opens several strong follow-up possibilities (e.g., SKORT, ALTAR, MOCHA), making it the most flexible and anchored move."}
+Current grid:
+S P A C E
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=2, col=1, direction='across', word='MOCHA', desc="Fills row 2 as 'Chocolate-flavored coffee drink' matching clue 6."), CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Fills row 4 as 'Hybrid women's golfing attire' matching clue 8.")]
+Final decision: row=2 col=1 direction='across' word='MOCHA' desc="Although the simulation flagged both candidates as invalid, MOCHA best matches the clue 'Chocolate-flavored coffee drink' (clue 6) and fits the row structure without conflicting with the given letters. We choose it as the most promising move to explore further."
+Decision: row=2 col=1 direction='across' word='MOCHA' desc="Although the simulation flagged both candidates as invalid, MOCHA best matches the clue 'Chocolate-flavored coffee drink' (clue 6) and fits the row structure without conflicting with the given letters. We choose it as the most promising move to explore further."
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fills the clue 'Chocolate-flavored coffee drink' (6-across)."), CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Completes 'Ending point for a walk down the aisle' (7-across), intersecting to support down answers.")]
+Candidate options: [CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-across 'Ending point for a walk down the aisle' with the wedding destination, ALTAR."), CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills 8-across 'Hybrid women's golfing attire' with SKORT, a blend of skirt and shorts.")]
+Candidate options: [CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-across 'Ending point for a walk down the aisle' (pun on 'aisle' vs. 'altar'); intersects with down answers."), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Fills 9-across 'Overly tough' using intersecting letters from down clues to complete the grid.")]
+Candidate options: [CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills 8-across 'Hybrid women's golfing attire' by combining elements of a skirt and shorts."), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Fills 9-across 'Overly tough', with intersections from down answers suggesting HARSH.")]
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fills 6-across: 'Chocolate-flavored coffee drink'. Its letters intersect well with down answers like 'SMASH' and 'ACTOR'."), CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Solves 8-across: 'Hybrid women's golfing attire', and matches intersecting down clues (e.g. POLKA and CHARS).")]
+Candidate options: [CrosswordMove(row=0, col=0, direction='down', word='SMASH', desc="Fills down clue 'Huge hit' (down 1) with SMASH (S from SPACE, A from ALTAR, S from SKORT) ensuring intersections."), CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Solves 6-across 'Chocolate-flavored coffee drink' with MOCHA, matching intersections (M aligns with SMASH in column 0).")]
+Candidate options: [CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills 8-across: 'Hybrid women's golfing attire' with a cross between a skirt and shorts, intersecting to form down answers such as POLKA and CHARS."), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Fills 9-across: 'Overly tough', fitting the crossing letters (H from SMASH, A from POLKA, R from ACTOR, S from CHARS, H from EARTH) and completing the grid.")]
+Final decision: row=2 col=0 direction='across' word='ALTAR' desc="Choosing ALTAR (placed at row 2, col 0) best completes the 7‐across clue 'Ending point for a walk down the aisle' and, via intersections, yields the expected down answers. In particular, it forces 9‐across to become HARSH, which in turn provides the correct letters for SMASH, POLKA, ACTOR, CHARS, and EARTH."
+Decision: row=2 col=0 direction='across' word='ALTAR' desc="Choosing ALTAR (placed at row 2, col 0) best completes the 7‐across clue 'Ending point for a walk down the aisle' and, via intersections, yields the expected down answers. In particular, it forces 9‐across to become HARSH, which in turn provides the correct letters for SMASH, POLKA, ACTOR, CHARS, and EARTH."
+Final action taken: {'row': 2, 'col': 0, 'direction': 'across', 'word': 'ALTAR', 'desc': "Choosing ALTAR (placed at row 2, col 0) best completes the 7‐across clue 'Ending point for a walk down the aisle' and, via intersections, yields the expected down answers. In particular, it forces 9‐across to become HARSH, which in turn provides the correct letters for SMASH, POLKA, ACTOR, CHARS, and EARTH."}
+Current grid:
+S P A C E
+_ _ _ _ _
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc='Fills the 5-letter answer for clue 6: Chocolate-flavored coffee drink.'), CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills the 5-letter answer for clue 8: Hybrid women's golfing attire.")]
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc='Fills the 5-letter answer for clue 6: Chocolate-flavored coffee drink.'), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc='Fills the 5-letter answer for clue 9: Overly tough, while completing the down answers.')]
+Candidate options: [CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc='Fills the 5-letter answer for clue 9: Overly tough, and completes the down answers (SMASH, POLKA, ACTOR, CHARS, EARTH).')]
+Candidate options: [CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc='Fills the 5-letter answer for clue 2: Chocolate-flavored coffee drink; provides intersecting letters for corresponding down answers.'), CrosswordMove(row=0, col=0, direction='down', word='SMASH', desc="Completes Down 1: Huge hit by inferring 'SMASH' (with the missing letter from the MOCHA move as its second letter).")]
+Candidate options: [CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills clue 8: Hybrid women's golfing attire (a hybrid of skirt and shorts)."), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc='Fills clue 9: Overly tough, matching intersections to form DOWN answers.')]
+Candidate options: [CrosswordMove(row=0, col=0, direction='down', word='SMASH', desc="Completes down clue 1 ('Huge hit') with SMASH in column 0 (S, M, A, S, H)."), CrosswordMove(row=0, col=1, direction='down', word='POLKA', desc='Fills down clue 2 (a music genre featuring accordion) by forming POLKA in column 1 (P, O, L, K, A).')]
+Candidate options: [CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills clue 8: Hybrid women's golfing attire. Intersections force letters S (for DOWN1 'SMASH'), K (for DOWN2 'POLKA'), O (for DOWN3 'ACTOR'), R (for DOWN4 'CHARS'), and T (for DOWN5 'EARTH')."), CrosswordMove(row=0, col=0, direction='down', word='SMASH', desc='Fills DOWN clue 1: Huge hit using letters S (row0), M (row1), A (row2), S (from SKORT row3), H (row4).')]
+Final decision: row=1 col=0 direction='across' word='MOCHA' desc='Selected candidate move (candidate 4) because placing MOCHA at row 1, col 0 not only solves the chocolate-flavored coffee drink clue but also completes key intersections for the down answers (POLKA, ACTOR, CHARS, and EARTH), offering a strong multi-clue resolution.'
+Decision: row=1 col=0 direction='across' word='MOCHA' desc='Selected candidate move (candidate 4) because placing MOCHA at row 1, col 0 not only solves the chocolate-flavored coffee drink clue but also completes key intersections for the down answers (POLKA, ACTOR, CHARS, and EARTH), offering a strong multi-clue resolution.'
+Final action taken: {'row': 1, 'col': 0, 'direction': 'across', 'word': 'MOCHA', 'desc': 'Selected candidate move (candidate 4) because placing MOCHA at row 1, col 0 not only solves the chocolate-flavored coffee drink clue but also completes key intersections for the down answers (POLKA, ACTOR, CHARS, and EARTH), offering a strong multi-clue resolution.'}
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Fills clue 8: Hybrid women's golfing attire (a skirt–shorts combo)"), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc='Fills clue 9: Overly tough; also forces down answers ACTOR, CHARS, and EARTH')]
+Final decision: row=5 col=1 direction='across' word='HARSH' desc='Although both candidate moves were flagged as invalid by simulation, the HARSH move was chosen because its forced intersections (ACTOR, CHARS, and EARTH) offer additional grid constraints and potential for progress compared to the SKORT move.'
+Decision: row=5 col=1 direction='across' word='HARSH' desc='Although both candidate moves were flagged as invalid by simulation, the HARSH move was chosen because its forced intersections (ACTOR, CHARS, and EARTH) offer additional grid constraints and potential for progress compared to the SKORT move.'
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Row 4: Hybrid women's golfing attire fits as SKORT, also completing Down2 (POLKA), Down3 (ACTOR), and Down4 (CHARS)."), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc='Row 5: Overly tough fits as HARSH, and it completes Down1 (SMASH), Down3 (ACTOR), and Down5 (EARTH).')]
+Final decision: row=4 col=1 direction='across' word='SKORT' desc='Although the simulation flagged it as invalid, this candidate move offers a stronger grid‐extension potential by simultaneously influencing three down words (POLKA, ACTOR, and CHARS). In synthesizing the branch evaluations, SKORT was chosen as the best candidate to pursue further reconciliation.'
+Decision: row=4 col=1 direction='across' word='SKORT' desc='Although the simulation flagged it as invalid, this candidate move offers a stronger grid‐extension potential by simultaneously influencing three down words (POLKA, ACTOR, and CHARS). In synthesizing the branch evaluations, SKORT was chosen as the best candidate to pursue further reconciliation.'
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Fills row 4 for clue 8 'Hybrid women's golfing attire'."), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc="Fills row 5 for clue 9 'Overly tough' and completes the intersecting down answers.")]
+Final decision: row=5 col=1 direction='across' word='HARSH' desc="Although the simulation flagged this move as invalid, it best addresses multiple constraints by aiming to complete both the across clue for row 5 ('Overly tough') and its intersecting down answers. It offers more grid completion impact compared to row 4's candidate."
+Decision: row=5 col=1 direction='across' word='HARSH' desc="Although the simulation flagged this move as invalid, it best addresses multiple constraints by aiming to complete both the across clue for row 5 ('Overly tough') and its intersecting down answers. It offers more grid completion impact compared to row 4's candidate."
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Clue 8: Hybrid women's golfing attire. Fills row 4 as SKORT."), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc='Clue 9: Overly tough. With intersecting down answers, row 5 completes as HARSH.')]
+Final decision: row=4 col=1 direction='across' word='SKORT' desc='Although both candidate moves were flagged as invalid in simulation, SKORT (for row 4) appears to be the cleaner option – it fills an entire empty row without needing to force intersections, making it the best candidate to pursue further adjustment.'
+Decision: row=4 col=1 direction='across' word='SKORT' desc='Although both candidate moves were flagged as invalid in simulation, SKORT (for row 4) appears to be the cleaner option – it fills an entire empty row without needing to force intersections, making it the best candidate to pursue further adjustment.'
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Fill row 4 with SKORT (hybrid women's golfing attire)."), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc='Fill row 5 with HARSH (overly tough) which correctly intersects the down answers.')]
+Final decision: row=5 col=1 direction='across' word='HARSH' desc='Both candidate moves were simulated as invalid, but the HARSH move correctly intersects the down answers according to its description, making it the more promising candidate despite its overall invalid status.'
+Decision: row=5 col=1 direction='across' word='HARSH' desc='Both candidate moves were simulated as invalid, but the HARSH move correctly intersects the down answers according to its description, making it the more promising candidate despite its overall invalid status.'
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Fill row 4 with 'SKORT' for hybrid women's golfing attire (clue 8), matching intersecting Down letters: K, O, R, T."), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc="Fill row 5 with 'HARSH' for overly tough (clue 9), aligning with Down answers SMASH, POLKA, ACTOR, CHARS, and EARTH.")]
+Final decision: row=4 col=1 direction='across' word='SKORT' desc='Among the candidates, SKORT (row 4, col 1, across) at least meets the clue intersection requirements (K, O, R, T) even though the simulation flagged it as invalid, making it the best candidate compared to HARSH.'
+Decision: row=4 col=1 direction='across' word='SKORT' desc='Among the candidates, SKORT (row 4, col 1, across) at least meets the clue intersection requirements (K, O, R, T) even though the simulation flagged it as invalid, making it the best candidate compared to HARSH.'
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=1, direction='across', word='SKORT', desc="Fills across clue 8 ('Hybrid women's golfing attire'); letters align with down answers."), CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc="Fills across clue 9 ('Overly tough'); intersections confirm answers for SMASH, POLKA, ACTOR, CHARS, and EARTH.")]
+Final decision: row=5 col=1 direction='across' word='HARSH' desc='Although simulation flagged HARSH as invalid, its intersections confirm multiple down answers (SMASH, POLKA, ACTOR, CHARS, and EARTH), making it the stronger candidate compared to SKORT.'
+Decision: row=5 col=1 direction='across' word='HARSH' desc='Although simulation flagged HARSH as invalid, its intersections confirm multiple down answers (SMASH, POLKA, ACTOR, CHARS, and EARTH), making it the stronger candidate compared to SKORT.'
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+_ _ _ _ _
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills row 3 for clue 8 (Hybrid women's golfing attire)"), CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc='Fills row 4 for clue 9 (Overly tough)')]
+Candidate options: [CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills row 3 for clue 8 (Hybrid women's golfing attire)")]
+Candidate options: [CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc='Fills row 4 for clue 9 (Overly tough) completing intersections for several down answers.'), CrosswordMove(row=0, col=0, direction='down', word='SMASH', desc='Completes down clue 1 (Huge hit) using the new letter from row 4.')]
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fill row 0 for clue 1 ('Give me some ___')"), CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fill row 1 for clue 6 ('Chocolate-flavored coffee drink')")]
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fills row 0 for clue 1 ('Give me some ___')"), CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc="Fills row 1 for clue 6 ('Chocolate-flavored coffee drink')")]
+Candidate options: [CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc='Fills row 4 (clue 9: Overly tough) completing the bottom row.'), CrosswordMove(row=0, col=1, direction='down', word='POLKA', desc='Fills column 1 (clue 2: Music genre that often includes an accordion) by adding the missing A at row 4, col 1.')]
+Final decision: row=3 col=0 direction='across' word='SKORT' desc="This move fills row 3 for clue 8 (Hybrid women's golfing attire) and, importantly, its simulation evaluation shows it anchors row 4 for clue 9 (Overly tough) by completing HARSH. This completion supplies essential letters for the intersecting down entries (ACTOR, CHARS, and EARTH), making it the most strategically beneficial move."
+Decision: row=3 col=0 direction='across' word='SKORT' desc="This move fills row 3 for clue 8 (Hybrid women's golfing attire) and, importantly, its simulation evaluation shows it anchors row 4 for clue 9 (Overly tough) by completing HARSH. This completion supplies essential letters for the intersecting down entries (ACTOR, CHARS, and EARTH), making it the most strategically beneficial move."
+Final action taken: {'row': 3, 'col': 0, 'direction': 'across', 'word': 'SKORT', 'desc': "This move fills row 3 for clue 8 (Hybrid women's golfing attire) and, importantly, its simulation evaluation shows it anchors row 4 for clue 9 (Overly tough) by completing HARSH. This completion supplies essential letters for the intersecting down entries (ACTOR, CHARS, and EARTH), making it the most strategically beneficial move."}
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+S K O R T
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=5, col=1, direction='across', word='HARSH', desc="Fills the bottom row to complete 'Overly tough' (HARSH) while matching intersecting down clues (SMASH, POLKA, ACTOR, CHARS, EARTH).")]
+Final decision: row=5 col=1 direction='across' word='HARSH' desc="Although one simulation flagged this move as invalid, placing 'HARSH' in row 5 produces the valid intersecting down words (SMASH, POLKA, ACTOR, CHARS, EARTH). Given the grid’s configuration, this candidate best fills the bottom row and aligns with all crossing clues, so we choose it as the final move."
+Decision: row=5 col=1 direction='across' word='HARSH' desc="Although one simulation flagged this move as invalid, placing 'HARSH' in row 5 produces the valid intersecting down words (SMASH, POLKA, ACTOR, CHARS, EARTH). Given the grid’s configuration, this candidate best fills the bottom row and aligns with all crossing clues, so we choose it as the final move."
+Final move was invalid. Retrying...
+Current grid:
+S P A C E
+M O C H A
+A L T A R
+S K O R T
+_ _ _ _ _
+Candidate options: [CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Fills the 9-Across answer, 'Overly tough', and completes row 5. It also supplies necessary letters for the down answers."), CrosswordMove(row=0, col=0, direction='down', word='SMASH', desc="Solves Down clue 1 'Huge hit' using S, M, A, S, H, ensuring row4 col0 becomes H for HARSH.")]
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fills 1-Across: 'Give me some ___'"), CrosswordMove(row=1, col=0, direction='across', word='MOCHA', desc='Fills 6-Across: Chocolate-flavored coffee drink')]
+Candidate options: [CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-Across: 'Ending point for a walk down the aisle'."), CrosswordMove(row=3, col=0, direction='across', word='SKORT', desc="Fills 8-Across: 'Hybrid women's golfing attire'.")]
+Candidate options: [CrosswordMove(row=0, col=0, direction='across', word='SPACE', desc="Fills 1-Across: 'Give me some ___', completing the phrase 'Give me some space'."), CrosswordMove(row=2, col=0, direction='across', word='ALTAR', desc="Fills 7-Across: 'Ending point for a walk down the aisle'.")]
+Candidate options: [CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Fill in row 4 with HARSH for clue 9 'Overly tough', using intersecting letters from down answers."), CrosswordMove(row=0, col=1, direction='down', word='POLKA', desc="Complete Down clue 2 'Music genre that often includes an accordion' by confirming POLKA in column 1.")]
+Candidate options: [CrosswordMove(row=4, col=0, direction='across', word='HARSH', desc="Complete Across clue 9 ('Overly tough') with HARSH. This fits with H, A already in place and sets the intersections to form ACTOR, CHARS, and EARTH for the Down answers."), CrosswordMove(row=0, col=2, direction='down', word='ACTOR', desc="With the letters from SPACE, MOCHA, ALTAR, SKORT and the R from HARSH, Down clue 3 ('Jamie Foxx or Michael J. Fox') spells ACTOR.")]
+Candidate options: [CrosswordMove(row=0, col=1, direction='down', word='POLKA', desc="Fill down clue 2 'Music genre that often includes an accordion' with POLKA."), CrosswordMove(row=0, col=2, direction='down', word='ACTOR', desc="Fill down clue 3 'Jamie Foxx or Michael J. Fox' with ACTOR.")]
+Final decision: row=4 col=0 direction='across' word='HARSH' desc="Filling row 4 with HARSH completes 9-Across ('Overly tough') while supplying the crucial H needed in column 0 to form SMASH for Down 1 and other intersecting answers. This move effectively anchors multiple clues."
+Decision: row=4 col=0 direction='across' word='HARSH' desc="Filling row 4 with HARSH completes 9-Across ('Overly tough') while supplying the crucial H needed in column 0 to form SMASH for Down 1 and other intersecting answers. This move effectively anchors multiple clues."
+Final action taken: {'row': 4, 'col': 0, 'direction': 'across', 'word': 'HARSH', 'desc': "Filling row 4 with HARSH completes 9-Across ('Overly tough') while supplying the crucial H needed in column 0 to form SMASH for Down 1 and other intersecting answers. This move effectively anchors multiple clues."}
+Final result: S P A C E
+M O C H A
+A L T A R
+S K O R T
+H A R S H

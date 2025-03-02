@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["EJECT", "LEMUR", "CLARO", "ALIST", "POLE"],
+      "down": ["ELCAP", "JELLO", "EMAIL", "CURSE", "TROT"]
+    },
+    "clues": {
+      "across": [
+        "1. Button whose icon is a triangle above a rectangle",
+        "6. Only primate species that can have blue eyes, aside from human",
+        "7. \"Of course,\" in Spanish",
+        "8. Star-studded group",
+        "9. Classic fixture outside a barbershop"
+      ],
+      "down": [
+        "1. Famous Yosemite landmark, familiarly",
+        "2. What jiggles after it's set",
+        "3. One might end with \"Best,\"",
+        "4. \"$%@!\", e.g.",
+        "5. Jogging gait"
+      ]
+    },
+    "grid": [
+      "E", "J", "E", "C", "T",
+      "L", "E", "M", "U", "R",
+      "C", "L", "A", "R", "O",
+      "A", "L", "I", "S", "T",
+      "P", "O", "L", "E", " "
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 5,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 11",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

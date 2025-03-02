@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["GAME", "ARROW", "MAINE", "EPEES", "NEST"],
+      "down": ["AMEN", "GRAPE", "ARIES", "MONET", "EWES"]
+    },
+    "clues": {
+      "across": [
+        "1. \"It's only a ___\" (response to a sore loser)",
+        "5. Here's a pointer!",
+        "6. ME, in an address",
+        "7. Fencing swords at the Olympics",
+        "8. Fit one inside the other, like measuring cups"
+      ],
+      "down": [
+        "1. Purple candy flavor",
+        "2. Zodiac ram",
+        "3. French painter of \"Water Lilies\"",
+        "4. Rams' mates",
+        "5. Last word of grace"
+      ]
+    },
+    "grid": [
+      " ", "G", "A", "M", "E",
+      "A", "R", "R", "O", "W",
+      "M", "A", "I", "N", "E",
+      "E", "P", "E", "E", "S",
+      "N", "E", "S", "T", " "
+    ],
+    "gridnums": [
+      0, 1, 2, 3, 4,
+      5, 0, 0, 0, 0,
+      6, 0, 0, 0, 0,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 8",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }

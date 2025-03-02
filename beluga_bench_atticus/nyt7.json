@@ -1,0 +1,47 @@
+{
+    "acrossmap": null,
+    "admin": false,
+    "answers": {
+      "across": ["BOSS", "RULER", "ATARI", "SITUP", "SEEME"],
+      "down": ["BRASS", "OUTIE", "SLATE", "SERUM", "RIPE"]
+    },
+    "clues": {
+      "across": [
+        "1. Bowser in the Mario games, e.g.",
+        "5. It's made to measure",
+        "7. Video game company named after a term in the board game Go",
+        "8. Exercise similar to a crunch",
+        "9. Unwelcome message on a graded paper"
+      ],
+      "down": [
+        "1. Word before knuckles or tacks",
+        "2. Pop-up button?",
+        "3. Classic blackboard material",
+        "4. Concentrated form of many cosmetics",
+        "6. Ready to eat, as fruit"
+      ]
+    },
+    "grid": [
+      "B", "O", "S", "S", " ",
+      "R", "U", "L", "E", "R",
+      "A", "T", "A", "R", "I",
+      "S", "I", "T", "U", "P",
+      "S", "E", "E", "M", "E"
+    ],
+    "gridnums": [
+      1, 2, 3, 4, 0,
+      5, 0, 0, 0, 6,
+      7, 0, 0, 0, 0,
+      8, 0, 0, 0, 0,
+      9, 0, 0, 0, 0
+    ],
+    "size": {
+      "cols": 5,
+      "rows": 5
+    },
+    "title": "Crossword 7",
+    "author": "Claude",
+    "date": "2025/03/01",
+    "dow": "Saturday",
+    "publisher": "Claude Crosswords"
+  }
